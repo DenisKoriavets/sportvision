@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/smart_expense_tracker_db
+    url: jdbc:postgresql://localhost:5432/sportvision_db
     username: postgres
     password: postgres
   jpa:

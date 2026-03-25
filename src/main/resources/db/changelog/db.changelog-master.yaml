@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - preConditions:
+      - onFail: HALT
+        onError: HALT
+
+  - include:
+      file: db/changelog/migrations/001-create-parents-table.xml
