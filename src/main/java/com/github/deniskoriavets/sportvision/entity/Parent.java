@@ -8,6 +8,8 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
@@ -44,6 +46,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @SQLRestriction("is_deleted = false")
 public class Parent implements UserDetails {
   @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
   @ToString.Include
   @EqualsAndHashCode.Include
   private UUID id;
@@ -77,9 +80,11 @@ public class Parent implements UserDetails {
 
   @Column(nullable = false)
   @ToString.Include
+  @Builder.Default
   private boolean isActive = true;
 
   @Column(nullable = false)
+  @Builder.Default
   private boolean isEmailVerified = false;
 
   private UUID emailVerificationToken;
@@ -92,6 +97,7 @@ public class Parent implements UserDetails {
   private LocalDateTime createdAt;
 
   @Column(nullable = false)
+  @Builder.Default
   private boolean isDeleted = false;
 
   @Override
