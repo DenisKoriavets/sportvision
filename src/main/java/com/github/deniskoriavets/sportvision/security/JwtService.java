@@ -18,74 +18,65 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class JwtService {
-  private final JwtProperties jwtProperties;
+    private final JwtProperties jwtProperties;
 
-  public String generateAccessToken(UserDetails userDetails) {
-    Map<String, Object> extraClaims = new HashMap<>();
-    extraClaims.put("roles", userDetails.getAuthorities().stream()
-        .map(GrantedAuthority::getAuthority)
-        .toList());
-    return generateJwtToken(userDetails, jwtProperties.getExpiration(), extraClaims);
-  }
+    public String generateAccessToken(UserDetails userDetails) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("roles", userDetails.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .toList());
+        return generateJwtToken(extraClaims, userDetails,
+            jwtProperties.getExpiration());
+    }
 
-  public String generateRefreshToken(UserDetails userDetails) {
-    Map<String, Object> extraClaims = new HashMap<>();
-    extraClaims.put("roles", userDetails.getAuthorities().stream()
-        .map(GrantedAuthority::getAuthority)
-        .toList());
-    return generateJwtToken(userDetails, jwtProperties.getRefreshToken().getExpiration(),
-        extraClaims);
-  }
+    public String generateRefreshToken(UserDetails userDetails) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("roles", userDetails.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .toList());
+        return generateJwtToken(extraClaims, userDetails,
+            jwtProperties.getRefreshToken().getExpiration());
+    }
 
-  public String extractUsername(String token) {
-    return extractClaim(token, Claims::getSubject);
-  }
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
 
-  public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-    final Claims claims = extractAllClaims(token);
-    return claimsResolver.apply(claims);
-  }
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
 
-  public boolean isTokenValid(String token, UserDetails userDetails) {
-    final String username = extractUsername(token);
-    return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-  }
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
 
-  private String generateJwtToken(UserDetails userDetails, long expiration, Map<String,
-      Object> claims) {
-    return Jwts.builder()
-        .subject(userDetails.getUsername())
-        .claims(claims)
-        .expiration(new Date(System.currentTimeMillis() + expiration))
-        .signWith(getSignInKey())
-        .compact();
-  }
+    private SecretKey getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretKey());
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
-  private SecretKey getSignInKey() {
-    byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretKey());
-    return Keys.hmacShaKeyFor(keyBytes);
-  }
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+            .verifyWith(getSignInKey())
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
+    }
 
-  private Claims extractAllClaims(String token) {
-    return Jwts.parser()
-        .verifyWith(getSignInKey())
-        .build()
-        .parseSignedClaims(token)
-        .getPayload();
-  }
+    private boolean isTokenExpired(String token) {
+        return extractClaim(token, Claims::getExpiration).before(new Date());
+    }
 
-  private boolean isTokenExpired(String token) {
-    return extractClaim(token, Claims::getExpiration).before(new Date());
-  }
-
-  private String generateJwtToken(Map<String, Object> extraClaims, UserDetails userDetails,
-                                  long expiration) {
-    return Jwts.builder()
-        .claims(extraClaims)
-        .subject(userDetails.getUsername())
-        .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(new Date(System.currentTimeMillis() + expiration))
-        .signWith(getSignInKey())
-        .compact();
-  }
+    private String generateJwtToken(Map<String, Object> extraClaims, UserDetails userDetails,
+                                    long expiration) {
+        return Jwts.builder()
+            .claims(extraClaims)
+            .subject(userDetails.getUsername())
+            .issuedAt(new Date(System.currentTimeMillis()))
+            .expiration(new Date(System.currentTimeMillis() + expiration))
+            .signWith(getSignInKey())
+            .compact();
+    }
 }
