@@ -30,11 +30,7 @@ public class JwtService {
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
-        Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("roles", userDetails.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .toList());
-        return generateJwtToken(extraClaims, userDetails,
+        return generateJwtToken(new HashMap<>(), userDetails,
             jwtProperties.getRefreshToken().getExpiration());
     }
 
