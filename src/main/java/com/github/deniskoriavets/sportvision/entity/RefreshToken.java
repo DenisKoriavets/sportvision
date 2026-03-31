@@ -29,7 +29,9 @@ public class RefreshToken {
     @Column(nullable = false)
     private Instant expiryDate;
 
-    private boolean revoked;
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean revoked = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id", nullable = false)

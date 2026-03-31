@@ -28,6 +28,7 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -45,93 +46,81 @@ import org.springframework.security.core.userdetails.UserDetails;
 @SQLDelete(sql = "UPDATE parents SET is_deleted = true WHERE id = ?")
 @SQLRestriction("is_deleted = false")
 public class Parent implements UserDetails {
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  @ToString.Include
-  @EqualsAndHashCode.Include
-  private UUID id;
 
-  @Column(nullable = false, unique = true)
-  @ToString.Include
-  private String email;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    private UUID id;
 
-  @Column(nullable = false)
-  private String passwordHash;
+    @Column(nullable = false)
+    private String firstName;
 
-  @Column(nullable = false)
-  @ToString.Include
-  private String firstName;
+    @Column(nullable = false)
+    private String lastName;
 
-  @Column(nullable = false)
-  @ToString.Include
-  private String lastName;
+    @Column(unique = true, nullable = false)
+    @ToString.Include
+    private String email;
 
-  @Column(nullable = false)
-  @Enumerated(EnumType.STRING)
-  @ToString.Include
-  private Role role;
+    @Column(nullable = false)
+    private String passwordHash;
 
-  @ElementCollection(targetClass = NotificationPreference.class)
-  @Enumerated(EnumType.STRING)
-  @CollectionTable(name = "parent_notification_preferences", joinColumns = @JoinColumn(name = "parent_id"))
-  @Column(name = "notification_preferences")
-  private Set<NotificationPreference> notificationPreferences;
-  private String telegramChatId;
+    // Додаємо поле, яке було в міграції, але було відсутнє в коді
+    private String phone;
 
-  @Column(nullable = false)
-  @ToString.Include
-  @Builder.Default
-  private boolean isActive = true;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
-  @Column(nullable = false)
-  @Builder.Default
-  private boolean isEmailVerified = false;
+    @Builder.Default
+    private boolean isActive = true;
 
-  private UUID emailVerificationToken;
+    @Builder.Default
+    private boolean isEmailVerified = false;
 
-  private LocalDateTime emailVerificationTokenExpiresAt;
+    @Builder.Default
+    private boolean isDeleted = false;
 
-  @Column(nullable = false)
-  @ToString.Include
-  @CreationTimestamp
-  private LocalDateTime createdAt;
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
-  @Column(nullable = false)
-  @Builder.Default
-  private boolean isDeleted = false;
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
-  }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
 
-  @Override
-  public @Nullable String getPassword() {
-    return passwordHash;
-  }
+    @Override
+    public String getPassword() {
+        return passwordHash;
+    }
 
-  @Override
-  public String getUsername() {
-    return email;
-  }
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
-  }
+    @Override
+    public boolean isEnabled() {
+        return isActive && !isDeleted;
+    }
 
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-  @Override
-  public boolean isEnabled() {
-    return isActive && !isDeleted;
-  }
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 }
