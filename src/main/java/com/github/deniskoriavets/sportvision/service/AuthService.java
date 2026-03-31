@@ -161,16 +161,4 @@ public class AuthService {
 
         return new AuthResponse(accessToken, refreshTokenStr);
     }
-
-    private void saveVerificationToken(Parent parent, String token) {
-        LocalDateTime expiryDate = LocalDateTime.now().plusHours(24);
-
-        VerificationToken verificationToken = VerificationToken.builder()
-            .token(token)
-            .parent(parent)
-            .expiryDate(expiryDate)
-            .build();
-
-        verificationTokenRepository.save(verificationToken);
-    }
 }

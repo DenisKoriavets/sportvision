@@ -8,6 +8,4 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface ParentRepository extends JpaRepository<Parent, UUID> {
   Optional<Parent> findByEmail(String email);
-
-  boolean existsByEmail(String email);
 }
