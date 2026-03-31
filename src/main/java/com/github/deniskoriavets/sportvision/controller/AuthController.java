@@ -2,7 +2,9 @@ package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.dto.AuthResponse;
 import com.github.deniskoriavets.sportvision.dto.LoginRequest;
+import com.github.deniskoriavets.sportvision.dto.RefreshTokenRequest;
 import com.github.deniskoriavets.sportvision.dto.RegisterRequest;
+import com.github.deniskoriavets.sportvision.dto.ResendVerificationRequest;
 import com.github.deniskoriavets.sportvision.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +29,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
+    @Operation(summary = "Реєстрація нового користувача (батька)")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -34,14 +38,12 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "Автентифікація користувача та отримання токенів")
-    public ResponseEntity<AuthResponse> login(
-        @Valid @RequestBody LoginRequest request
-    ) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
     @GetMapping("/verify")
-    @Operation(summary = "Підтвердження пошти")
+    @Operation(summary = "Підтвердження пошти за допомогою токена")
     public ResponseEntity<Void> verify(@RequestParam String token) {
         authService.verifyEmail(token);
         return ResponseEntity.ok().build();
@@ -49,21 +51,22 @@ public class AuthController {
 
     @PostMapping("/refresh")
     @Operation(summary = "Оновлення Access Token за допомогою Refresh Token")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody String refreshToken) {
-        return ResponseEntity.ok(authService.refresh(refreshToken));
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refresh(request.refreshToken()));
     }
 
     @PostMapping("/resend-verification")
-    @Operation(summary = "Повторна відправка листа")
-    public ResponseEntity<Void> resendVerification(@RequestParam String email) {
-        authService.resendVerification(email);
+    @Operation(summary = "Повторна відправка листа для верифікації")
+    public ResponseEntity<Void> resendVerification(@Valid @RequestBody
+                                                   ResendVerificationRequest request) {
+        authService.resendVerification(request.email());
         return ResponseEntity.accepted().build();
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "Вихід із системи (анулювання токена)")
-    public ResponseEntity<Void> logout(@RequestBody String refreshToken) {
-        authService.logout(refreshToken);
+    @Operation(summary = "Вихід із системи (анулювання Refresh токена)")
+    public ResponseEntity<Void> logout(@Valid @RequestBody RefreshTokenRequest request) {
+        authService.logout(request.refreshToken());
         return ResponseEntity.noContent().build();
     }
 }
