@@ -1,12 +1,11 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
     show-sql: false
   liquibase:
+    enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
 application:
@@ -18,5 +17,6 @@ application:
         expiration: 604800000
 app:
   sendgrid:
-    api-key: "SG.stub_key_for_ci_pipeline_testing_only_123456789"
-  verification-url: http://localhost:8080/api/v1/auth/verify
+    api-key: "SG.stub_key_for_testing"
+    from-email: "test@sportvision.com"
+  verification-url: "http://localhost:8080/api/v1/auth/verify"

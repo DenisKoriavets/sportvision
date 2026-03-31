@@ -9,9 +9,10 @@ import com.github.deniskoriavets.sportvision.entity.RefreshToken;
 import com.github.deniskoriavets.sportvision.entity.VerificationToken;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
 import com.github.deniskoriavets.sportvision.exception.EmailAlreadyTakenException;
-import com.github.deniskoriavets.sportvision.exception.EmailAlreadyVerifiedException;
 import com.github.deniskoriavets.sportvision.exception.EmailNotVerifiedException;
+import com.github.deniskoriavets.sportvision.exception.InvalidCredentialsException;
 import com.github.deniskoriavets.sportvision.exception.InvalidTokenException;
+import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.exception.TokenExpiredException;
 import com.github.deniskoriavets.sportvision.repository.ParentRepository;
 import com.github.deniskoriavets.sportvision.repository.RefreshTokenRepository;
@@ -21,9 +22,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,37 +43,43 @@ public class AuthService {
 
     @Transactional
     public void register(RegisterRequest request) {
-        if (parentRepository.existsByEmail(request.email())) {
-            throw new EmailAlreadyTakenException("Email " + request.email() + " вже зайнятий");
+        try {
+            Parent parent = Parent.builder()
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .email(request.email())
+                .passwordHash(passwordEncoder.encode(request.password()))
+                .role(Role.PARENT)
+                .build();
+
+            Parent savedParent = parentRepository.save(parent);
+
+            String token = UUID.randomUUID().toString();
+            VerificationToken verificationToken = VerificationToken.builder()
+                .token(token)
+                .parent(savedParent)
+                .expiryDate(LocalDateTime.now().plusHours(24))
+                .build();
+
+            verificationTokenRepository.save(verificationToken);
+            emailService.sendVerificationEmail(savedParent.getEmail(), token);
+
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailAlreadyTakenException("Email " + request.email() + " is already registered");
         }
-
-        Parent parent = Parent.builder()
-            .email(request.email())
-            .passwordHash(passwordEncoder.encode(request.password()))
-            .firstName(request.firstName())
-            .lastName(request.lastName())
-            .role(Role.PARENT)
-            .isEmailVerified(false)
-            .build();
-
-        parentRepository.save(parent);
-
-        String verificationToken = UUID.randomUUID().toString();
-        saveVerificationToken(parent, verificationToken);
-
-        emailService.sendVerificationEmail(parent.getEmail(), verificationToken);
     }
 
+    @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
+        Parent parent = parentRepository.findByEmail(request.email())
+            .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 
-        var parent = parentRepository.findByEmail(request.email())
-            .orElseThrow();
+        if (!passwordEncoder.matches(request.password(), parent.getPasswordHash())) {
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
 
         if (!parent.isEmailVerified()) {
-            throw new EmailNotVerifiedException("Будь ласка, підтвердіть вашу пошту");
+            throw new EmailNotVerifiedException("Please verify your email first");
         }
 
         return generateAuthResponse(parent);
@@ -122,13 +128,24 @@ public class AuthService {
     @Transactional
     public void resendVerification(String email) {
         Parent parent = parentRepository.findByEmail(email)
-            .orElseThrow(() -> new UsernameNotFoundException("Email не знайдено"));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
         if (parent.isEmailVerified()) {
-            throw new EmailAlreadyVerifiedException("Email вже підтверджено");
+            throw new IllegalStateException("Email is already verified");
         }
-        refreshTokenRepository.deleteAllByParent(parent);
-        saveVerificationToken(parent, UUID.randomUUID().toString());
-        emailService.sendVerificationEmail(parent.getEmail(), email);
+
+        verificationTokenRepository.deleteByParent(parent);
+
+        String token = UUID.randomUUID().toString();
+        VerificationToken verificationToken = VerificationToken.builder()
+            .token(token)
+            .parent(parent)
+            .expiryDate(LocalDateTime.now().plusHours(24))
+            .build();
+
+        verificationTokenRepository.save(verificationToken);
+
+        emailService.sendVerificationEmail(parent.getEmail(), token);
     }
 
     private AuthResponse generateAuthResponse(Parent parent) {
