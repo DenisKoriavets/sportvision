@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -49,8 +50,9 @@ public class Section {
     @Builder.Default
     private boolean isDeleted = false;
 
+    @Builder.Default
     @OneToMany(mappedBy = "section", fetch = FetchType.LAZY)
-    private List<Group> groups;
+    private List<Group> groups = new ArrayList<>();
 
     public void addGroup(Group group) {
         groups.add(group);
