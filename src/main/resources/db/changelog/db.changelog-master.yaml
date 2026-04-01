@@ -11,3 +11,7 @@ databaseChangeLog:
       file: db/changelog/migrations/003-create-refresh-tokens-table.xml
   - include:
       file: db/changelog/migrations/004-create-verification-tokens-table.xml
+  - include:
+      file: db/changelog/migrations/005-create-sections-table.xml
+  - include:
+      file: db/changelog/migrations/006-create-groups-table.xml
