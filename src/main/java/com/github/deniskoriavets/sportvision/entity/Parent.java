@@ -54,9 +54,11 @@ public class Parent implements UserDetails {
     private UUID id;
 
     @Column(nullable = false)
+    @ToString.Include
     private String firstName;
 
     @Column(nullable = false)
+    @ToString.Include
     private String lastName;
 
     @Column(unique = true, nullable = false)
@@ -66,11 +68,11 @@ public class Parent implements UserDetails {
     @Column(nullable = false)
     private String passwordHash;
 
-    // Додаємо поле, яке було в міграції, але було відсутнє в коді
     private String phone;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @ToString.Include
     private Role role;
 
     @Builder.Default
