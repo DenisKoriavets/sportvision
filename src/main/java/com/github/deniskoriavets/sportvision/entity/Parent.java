@@ -2,18 +2,22 @@ package com.github.deniskoriavets.sportvision.entity;
 
 import com.github.deniskoriavets.sportvision.entity.enums.NotificationPreference;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -81,6 +85,7 @@ public class Parent implements UserDetails {
     @Builder.Default
     private boolean isEmailVerified = false;
 
+    @Column(nullable = false)
     @Builder.Default
     private boolean isDeleted = false;
 
@@ -90,6 +95,10 @@ public class Parent implements UserDetails {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Child> children = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="7" author="deniskoriavets">
+        <createTable tableName="children">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="parent_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_children_parent"
+                             referencedTableName="parents"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="group_id" type="UUID">
+                <constraints foreignKeyName="fk_children_group"
+                             referencedTableName="groups"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birth_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="children" indexName="idx_children_parent_id">
+            <column name="parent_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

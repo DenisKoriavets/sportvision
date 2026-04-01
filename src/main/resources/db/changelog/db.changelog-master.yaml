@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/migrations/005-create-sections-table.xml
   - include:
       file: db/changelog/migrations/006-create-groups-table.xml
+  - include:
+      file: db/changelog/migrations/007-create-children-table.xml
