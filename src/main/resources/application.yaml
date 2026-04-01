@@ -2,7 +2,7 @@ spring:
   config:
     import: optional:file:.env[.properties]
   application:
-    name: smart-expense-tracker
+    name: sportvision
   profiles:
     active: dev
   liquibase:
@@ -13,3 +13,9 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+app:
+  sendgrid:
+    api-key: ${SENDGRID_API_KEY}
+    from-email: ${SENDGRID_FROM_EMAIL}
+  verification-url: http://localhost:8080/api/v1/auth/verify
