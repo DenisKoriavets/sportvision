@@ -23,3 +23,5 @@ databaseChangeLog:
       file: db/changelog/migrations/009-create-sessions-table.xml
   - include:
       file: db/changelog/migrations/010-create-attendance-table.xml
+  - include:
+      file: db/changelog/migrations/011-create-subscription-plans-table.xml
