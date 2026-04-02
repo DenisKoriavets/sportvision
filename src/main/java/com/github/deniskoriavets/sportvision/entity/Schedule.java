@@ -1,18 +1,18 @@
 package com.github.deniskoriavets.sportvision.entity;
 
-import jakarta.persistence.CascadeType;
+import com.github.deniskoriavets.sportvision.entity.enums.DayOfWeek;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +25,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "groups")
+@Table(name = "schedules")
 @Getter
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
@@ -33,9 +33,9 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@SQLDelete(sql = "UPDATE groups SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE schedules SET is_deleted = true WHERE id = ?")
 @SQLRestriction("is_deleted = false")
-public class Group {
+public class Schedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -44,41 +44,26 @@ public class Group {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "section_id", nullable = false)
+    @JoinColumn(name = "group_id", nullable = false)
     @ToString.Include
-    private Section section;
+    private Group group;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coach_id", nullable = false)
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @ToString.Include
-    private Parent coach;
+    private DayOfWeek dayOfWeek;
 
     @Column(nullable = false)
     @ToString.Include
-    private String name;
-
-    private Integer ageMin;
-
-    private Integer ageMax;
+    private LocalTime startTime;
 
     @Column(nullable = false)
-    private Integer maxCapacity;
+    @ToString.Include
+    private LocalTime endTime;
+
+    private String location;
 
     @Column(nullable = false)
     @Builder.Default
     private boolean isDeleted = false;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Schedule> schedules = new ArrayList<>();
-
-    public void addSchedule(Schedule schedule) {
-        schedules.add(schedule);
-        schedule.setGroup(this);
-    }
-
-    public void removeSchedule(Schedule schedule) {
-        schedules.remove(schedule);
-        schedule.setGroup(null);
-    }
 }
