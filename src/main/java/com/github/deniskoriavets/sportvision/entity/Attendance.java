@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.entity;
 
-import com.github.deniskoriavets.sportvision.entity.enums.SessionStatus;
+import com.github.deniskoriavets.sportvision.entity.enums.AttendanceStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,8 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +25,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "sessions")
+@Table(name = "attendances")
 @Getter
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
@@ -34,9 +33,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@SQLDelete(sql = "UPDATE sessions SET is_deleted = true WHERE id = ?")
-@SQLRestriction("is_deleted = false")
-public class Session {
+public class Attendance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -45,34 +42,27 @@ public class Session {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id", nullable = false)
+    @JoinColumn(name = "session_id", nullable = false)
     @ToString.Include
-    private Group group;
+    private Session session;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schedule_id")
-    private Schedule schedule;
-
-    @Column(nullable = false)
+    @JoinColumn(name = "child_id", nullable = false)
     @ToString.Include
-    private LocalDate date;
+    private Child child;
 
-    @Column(nullable = false)
-    @ToString.Include
-    private LocalTime startTime;
-
-    @Column(nullable = false)
-    @ToString.Include
-    private LocalTime endTime;
-
-    @Column(nullable = false)
-    @ToString.Include
     @Enumerated(EnumType.STRING)
-    private SessionStatus status;
-
-    private String cancelReason;
+    @Column(nullable = false)
+    @ToString.Include
+    private AttendanceStatus status;
 
     @Column(nullable = false)
     @Builder.Default
-    private boolean isDeleted = false;
+    @ToString.Include
+    private LocalDateTime markedAt = LocalDateTime.now();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "marked_by_coach_id", nullable = false)
+    @ToString.Include
+    private Parent markedByCoachId;
 }
