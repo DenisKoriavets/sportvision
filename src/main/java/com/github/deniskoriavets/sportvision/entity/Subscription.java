@@ -34,7 +34,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@SQLDelete(sql = "UPDATE subscriptions SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE subscriptions SET is_deleted = true WHERE id = ? AND version = ?")
 @SQLRestriction("is_deleted = false")
 public class Subscription {
     @Id
