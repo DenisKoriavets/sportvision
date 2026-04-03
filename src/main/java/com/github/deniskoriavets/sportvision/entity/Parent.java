@@ -19,6 +19,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -99,6 +100,17 @@ public class Parent implements UserDetails {
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Child> children = new ArrayList<>();
+
+    private String telegramChatId;
+
+    @ElementCollection(targetClass = NotificationPreference.class, fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "parent_notification_preferences",
+        joinColumns = @JoinColumn(name = "parent_id")
+    )
+    @Column(name = "notification_preferences")
+    @Enumerated(EnumType.STRING)
+    private Set<NotificationPreference> notificationPreferences = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

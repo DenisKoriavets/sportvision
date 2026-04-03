@@ -64,5 +64,5 @@ public class Attendance {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "marked_by_coach_id", nullable = false)
     @ToString.Include
-    private Parent markedByCoachId;
+    private Parent markedByCoach;
 }

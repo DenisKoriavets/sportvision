@@ -14,7 +14,9 @@
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="parent_id" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_verification_tokens_parent" referencedTableName="parents" referencedColumnNames="id"/>
+                <constraints nullable="false" foreignKeyName="fk_verification_tokens_parent"
+                             referencedTableName="parents" referencedColumnNames="id"
+                             unique="true"/>
             </column>
             <column name="expiry_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
