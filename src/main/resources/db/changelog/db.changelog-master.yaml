@@ -11,3 +11,21 @@ databaseChangeLog:
       file: db/changelog/migrations/003-create-refresh-tokens-table.xml
   - include:
       file: db/changelog/migrations/004-create-verification-tokens-table.xml
+  - include:
+      file: db/changelog/migrations/005-create-sections-table.xml
+  - include:
+      file: db/changelog/migrations/006-create-groups-table.xml
+  - include:
+      file: db/changelog/migrations/007-create-children-table.xml
+  - include:
+      file: db/changelog/migrations/008-create-schedules-table.xml
+  - include:
+      file: db/changelog/migrations/009-create-sessions-table.xml
+  - include:
+      file: db/changelog/migrations/010-create-attendance-table.xml
+  - include:
+      file: db/changelog/migrations/011-create-subscription-plans-table.xml
+  - include:
+      file: db/changelog/migrations/012-create-subscriptions-table.xml
+  - include:
+      file: db/changelog/migrations/013-create-payments-table.xml

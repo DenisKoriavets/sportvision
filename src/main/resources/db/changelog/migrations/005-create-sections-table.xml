@@ -5,20 +5,16 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
-    <changeSet id="4" author="deniskoriavets">
-        <createTable tableName="verification_tokens">
+    <changeSet id="5" author="deniskoriavets">
+        <createTable tableName="sections">
             <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="token" type="VARCHAR(255)">
+            <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="parent_id" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_verification_tokens_parent"
-                             referencedTableName="parents" referencedColumnNames="id"
-                             unique="true"/>
-            </column>
-            <column name="expiry_date" type="TIMESTAMP">
+            <column name="description" type="VARCHAR(1000)"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
         </createTable>

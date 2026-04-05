@@ -2,19 +2,24 @@ package com.github.deniskoriavets.sportvision.entity;
 
 import com.github.deniskoriavets.sportvision.entity.enums.NotificationPreference;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -54,9 +59,11 @@ public class Parent implements UserDetails {
     private UUID id;
 
     @Column(nullable = false)
+    @ToString.Include
     private String firstName;
 
     @Column(nullable = false)
+    @ToString.Include
     private String lastName;
 
     @Column(unique = true, nullable = false)
@@ -66,11 +73,11 @@ public class Parent implements UserDetails {
     @Column(nullable = false)
     private String passwordHash;
 
-    // Додаємо поле, яке було в міграції, але було відсутнє в коді
     private String phone;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @ToString.Include
     private Role role;
 
     @Builder.Default
@@ -79,6 +86,7 @@ public class Parent implements UserDetails {
     @Builder.Default
     private boolean isEmailVerified = false;
 
+    @Column(nullable = false)
     @Builder.Default
     private boolean isDeleted = false;
 
@@ -88,6 +96,21 @@ public class Parent implements UserDetails {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Child> children = new ArrayList<>();
+
+    private String telegramChatId;
+
+    @ElementCollection(targetClass = NotificationPreference.class, fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "parent_notification_preferences",
+        joinColumns = @JoinColumn(name = "parent_id")
+    )
+    @Column(name = "notification_preferences")
+    @Enumerated(EnumType.STRING)
+    private Set<NotificationPreference> notificationPreferences = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
