@@ -82,7 +82,6 @@ class SubscriptionRepositoryTest extends BaseIntegrationTest {
                 .totalSessions(8)
                 .remainingSessions(8)
                 .status(SubscriptionStatus.ACTIVE)
-                .version(0)
                 .build());
 
         assertThat(sub.getVersion()).isEqualTo(0);
@@ -133,5 +132,11 @@ class SubscriptionRepositoryTest extends BaseIntegrationTest {
         subscriptionRepository.delete(sub);
 
         assertThat(subscriptionRepository.findById(sub.getId())).isEmpty();
+
+        Boolean isDeleted = jdbcTemplate.queryForObject(
+            "SELECT is_deleted FROM subscriptions WHERE id = ?",
+            Boolean.class, sub.getId()
+        );
+        assertThat(isDeleted).isTrue();
     }
 }
