@@ -11,5 +11,9 @@ public interface ChildMapper {
     @Mapping(source = "group.id", target = "groupId")
     ChildResponse toResponse(Child child);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "group", ignore = true)
+    @Mapping(target = "isDeleted", ignore = true)
     Child toEntity(ChildRequest request);
 }

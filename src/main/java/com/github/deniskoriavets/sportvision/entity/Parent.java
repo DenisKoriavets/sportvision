@@ -110,6 +110,7 @@ public class Parent implements UserDetails {
     )
     @Column(name = "notification_preferences")
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private Set<NotificationPreference> notificationPreferences = new HashSet<>();
 
     @Override
