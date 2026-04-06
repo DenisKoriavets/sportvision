@@ -70,6 +70,8 @@ public class GroupServiceImpl implements GroupService {
 
         entity.setName(groupRequest.name());
         entity.setMaxCapacity(groupRequest.maxCapacity());
+        entity.setAgeMin(groupRequest.ageMin());
+        entity.setAgeMax(groupRequest.ageMax());
 
         if (!groupRequest.sectionId().equals(entity.getSection().getId())) {
             var newSection = sectionRepository.findById(groupRequest.sectionId())
@@ -94,6 +96,8 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
     public void deleteGroup(UUID id) {
-        groupRepository.deleteById(id);
+        var group = groupRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Group not found with id: " + id));
+        groupRepository.delete(group);
     }
 }

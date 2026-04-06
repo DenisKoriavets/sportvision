@@ -12,5 +12,7 @@ public record GroupRequest(
     UUID sectionId,
     UUID coachId,
     @Min(1)
-    Integer maxCapacity
+    Integer maxCapacity,
+    Integer ageMin,
+    Integer ageMax
 ) {}

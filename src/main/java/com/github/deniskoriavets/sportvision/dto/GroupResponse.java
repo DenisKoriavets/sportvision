@@ -9,6 +9,8 @@ public record GroupResponse(
     String sectionName,
     String coachName,
     Integer maxCapacity,
-    Integer currentOccupancy
+    Integer currentOccupancy,
+    Integer ageMin,
+    Integer ageMax
 ) {
 }

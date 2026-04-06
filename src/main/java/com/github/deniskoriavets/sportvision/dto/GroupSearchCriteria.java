@@ -4,5 +4,6 @@ import java.util.UUID;
 
 public record GroupSearchCriteria(
     String query,
-    UUID sectionId
+    UUID sectionId,
+    Boolean hasAvailableSlots
 ) {}

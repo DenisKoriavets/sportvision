@@ -1,7 +1,10 @@
 package com.github.deniskoriavets.sportvision.repository.specification;
 
 import com.github.deniskoriavets.sportvision.dto.GroupSearchCriteria;
+import com.github.deniskoriavets.sportvision.entity.Child;
 import com.github.deniskoriavets.sportvision.entity.Group;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -20,6 +23,15 @@ public class GroupSpecifications {
 
             if (criteria.sectionId() != null) {
                 predicates.add(cb.equal(root.get("section").get("id"), criteria.sectionId()));
+            }
+
+            if (criteria.hasAvailableSlots() != null && criteria.hasAvailableSlots()) {
+                Subquery<Long> subquery = query.subquery(Long.class);
+                Root<Child> childRoot = subquery.from(Child.class);
+                subquery.select(cb.count(childRoot));
+                subquery.where(cb.equal(childRoot.get("group"), root));
+
+                predicates.add(cb.greaterThan(root.get("maxCapacity"), subquery));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
