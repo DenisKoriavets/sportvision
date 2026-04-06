@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -35,7 +36,8 @@ public class SectionController {
     }
 
     @PostMapping
-    @Operation(summary = "Створити нову секцію")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Створити нову секцію (Тільки для ADMIN)")
     public ResponseEntity<SectionResponse> createSection(@Valid @RequestBody SectionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(sectionService.createSection(request));
     }
@@ -47,7 +49,8 @@ public class SectionController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Оновити дані секції")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Оновити дані секції (Тільки для ADMIN)")
     public ResponseEntity<SectionResponse> updateSection(
             @PathVariable UUID id,
             @Valid @RequestBody SectionRequest request
@@ -56,7 +59,8 @@ public class SectionController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Видалити секцію")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Видалити секцію (Тільки для ADMIN)")
     public ResponseEntity<Void> deleteSection(@PathVariable UUID id) {
         sectionService.deleteSection(id);
         return ResponseEntity.noContent().build();
