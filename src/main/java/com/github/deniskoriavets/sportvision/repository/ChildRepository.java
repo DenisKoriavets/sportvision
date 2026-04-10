@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChildRepository extends JpaRepository<Child, UUID> {
     List<Child> findAllByParentId(UUID parentId);
+
+    Integer countByGroupId(UUID groupId);
 }

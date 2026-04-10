@@ -15,4 +15,10 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
     );
 
     List<Subscription> findAllByChildId(UUID childId);
+
+    boolean existsByChildIdAndSubscriptionPlanSectionIdAndStatus(
+        UUID childId,
+        UUID sectionId,
+        SubscriptionStatus status
+    );
 }
