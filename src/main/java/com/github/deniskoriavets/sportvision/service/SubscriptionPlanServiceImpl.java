@@ -15,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
 
@@ -25,6 +27,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     private final SectionRepository sectionRepository;
 
     @Override
+    @Transactional
     public SubscriptionPlanResponse createSubscriptionPlan(
         SubscriptionPlanRequest subscriptionPlanRequest) {
         var session = sectionRepository.findById(subscriptionPlanRequest.sectionId())
@@ -50,6 +53,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     }
 
     @Override
+    @Transactional
     public SubscriptionPlanResponse updateSubscriptionPlan(UUID id,
                                                            SubscriptionPlanRequest request) {
         var subscriptionPlan = subscriptionPlanRepository.findById(id)
@@ -66,6 +70,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     }
 
     @Override
+    @Transactional
     public void deleteSubscriptionPlan(UUID id) {
         subscriptionPlanRepository.deleteById(id);
     }
