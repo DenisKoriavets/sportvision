@@ -4,6 +4,7 @@ import com.github.deniskoriavets.sportvision.entity.Subscription;
 import com.github.deniskoriavets.sportvision.entity.enums.SubscriptionStatus;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -21,4 +22,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
         UUID sectionId,
         SubscriptionStatus status
     );
+
+    Optional<Subscription> findFirstByChildIdAndSubscriptionPlanSectionIdAndStatus(UUID childId, UUID sectionId, SubscriptionStatus status);
 }
