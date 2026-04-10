@@ -1,6 +1,7 @@
 package com.github.deniskoriavets.sportvision.service;
 
 import com.github.deniskoriavets.sportvision.exception.EmailSendingException;
+import com.github.deniskoriavets.sportvision.service.interfaces.EmailService;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;

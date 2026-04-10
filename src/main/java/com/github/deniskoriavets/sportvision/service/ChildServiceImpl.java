@@ -7,7 +7,7 @@ import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException
 import com.github.deniskoriavets.sportvision.mapper.ChildMapper;
 import com.github.deniskoriavets.sportvision.repository.ChildRepository;
 import com.github.deniskoriavets.sportvision.security.SecurityFacade;
-import java.nio.channels.AcceptPendingException;
+import com.github.deniskoriavets.sportvision.service.interfaces.ChildService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class ChildServiceImpl implements ChildService {
 
     @Override
     @Transactional
-    public ChildResponse addChild(ChildRequest request) {
+    public ChildResponse createChild(ChildRequest request) {
         var currentUser = securityFacade.getCurrentUser();
         var child = childMapper.toEntity(request);
         child.setParent(currentUser);

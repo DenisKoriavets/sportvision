@@ -5,7 +5,7 @@ import com.github.deniskoriavets.sportvision.dto.LoginRequest;
 import com.github.deniskoriavets.sportvision.dto.RefreshTokenRequest;
 import com.github.deniskoriavets.sportvision.dto.RegisterRequest;
 import com.github.deniskoriavets.sportvision.dto.ResendVerificationRequest;
-import com.github.deniskoriavets.sportvision.service.AuthService;
+import com.github.deniskoriavets.sportvision.service.interfaces.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

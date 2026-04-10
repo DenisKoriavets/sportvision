@@ -8,6 +8,7 @@ import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException
 import com.github.deniskoriavets.sportvision.mapper.SectionMapper;
 import com.github.deniskoriavets.sportvision.repository.SectionRepository;
 import com.github.deniskoriavets.sportvision.repository.specification.SectionSpecifications;
+import com.github.deniskoriavets.sportvision.service.interfaces.SectionService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

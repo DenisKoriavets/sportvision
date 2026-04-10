@@ -1,4 +1,4 @@
-package com.github.deniskoriavets.sportvision.service;
+package com.github.deniskoriavets.sportvision.service.interfaces;
 
 import com.github.deniskoriavets.sportvision.dto.ChildRequest;
 import com.github.deniskoriavets.sportvision.dto.ChildResponse;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChildService {
-    ChildResponse addChild(ChildRequest request);
+    ChildResponse createChild(ChildRequest request);
 
     List<ChildResponse> getAllChildrenForCurrentUser();
 

@@ -5,7 +5,7 @@ import com.github.deniskoriavets.sportvision.dto.*;
 import com.github.deniskoriavets.sportvision.entity.*;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
 import com.github.deniskoriavets.sportvision.repository.*;
-import com.github.deniskoriavets.sportvision.service.EmailService;
+import com.github.deniskoriavets.sportvision.service.interfaces.EmailService;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package com.github.deniskoriavets.sportvision.service;
+package com.github.deniskoriavets.sportvision.service.interfaces;
 
 import com.github.deniskoriavets.sportvision.dto.SectionRequest;
 import com.github.deniskoriavets.sportvision.dto.SectionResponse;

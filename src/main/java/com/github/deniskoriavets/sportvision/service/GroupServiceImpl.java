@@ -10,6 +10,7 @@ import com.github.deniskoriavets.sportvision.repository.GroupRepository;
 import com.github.deniskoriavets.sportvision.repository.ParentRepository;
 import com.github.deniskoriavets.sportvision.repository.SectionRepository;
 import com.github.deniskoriavets.sportvision.repository.specification.GroupSpecifications;
+import com.github.deniskoriavets.sportvision.service.interfaces.GroupService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

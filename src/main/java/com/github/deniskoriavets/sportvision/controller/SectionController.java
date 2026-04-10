@@ -3,7 +3,7 @@ package com.github.deniskoriavets.sportvision.controller;
 import com.github.deniskoriavets.sportvision.dto.SectionRequest;
 import com.github.deniskoriavets.sportvision.dto.SectionResponse;
 import com.github.deniskoriavets.sportvision.dto.SectionSearchCriteria;
-import com.github.deniskoriavets.sportvision.service.SectionService;
+import com.github.deniskoriavets.sportvision.service.interfaces.SectionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

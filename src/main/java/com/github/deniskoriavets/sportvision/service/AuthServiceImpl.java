@@ -18,6 +18,8 @@ import com.github.deniskoriavets.sportvision.repository.ParentRepository;
 import com.github.deniskoriavets.sportvision.repository.RefreshTokenRepository;
 import com.github.deniskoriavets.sportvision.repository.VerificationTokenRepository;
 import com.github.deniskoriavets.sportvision.security.JwtService;
+import com.github.deniskoriavets.sportvision.service.interfaces.AuthService;
+import com.github.deniskoriavets.sportvision.service.interfaces.EmailService;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;

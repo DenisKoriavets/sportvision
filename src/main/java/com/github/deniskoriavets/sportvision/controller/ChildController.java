@@ -2,7 +2,7 @@ package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.dto.ChildRequest;
 import com.github.deniskoriavets.sportvision.dto.ChildResponse;
-import com.github.deniskoriavets.sportvision.service.ChildService;
+import com.github.deniskoriavets.sportvision.service.interfaces.ChildService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,7 +24,7 @@ public class ChildController {
     @PostMapping
     @Operation(summary = "Додати нову дитину")
     public ResponseEntity<ChildResponse> addChild(@Valid @RequestBody ChildRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(childService.addChild(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(childService.createChild(request));
     }
 
     @GetMapping
