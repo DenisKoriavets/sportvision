@@ -2,6 +2,7 @@ package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.dto.ChildRequest;
 import com.github.deniskoriavets.sportvision.dto.ChildResponse;
+import com.github.deniskoriavets.sportvision.dto.ChildSearchCriteria;
 import com.github.deniskoriavets.sportvision.service.interfaces.ChildService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +10,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,5 +54,13 @@ public class ChildController {
     public ResponseEntity<Void> deleteChild(@PathVariable UUID id) {
         childService.deleteChild(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Пошук дітей за ПІБ, групою або батьком")
+    public ResponseEntity<Page<ChildResponse>> searchChildren(
+        ChildSearchCriteria criteria,
+        Pageable pageable) {
+        return ResponseEntity.ok(childService.searchChildren(criteria, pageable));
     }
 }

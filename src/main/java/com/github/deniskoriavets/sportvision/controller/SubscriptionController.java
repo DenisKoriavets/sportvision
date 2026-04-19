@@ -41,7 +41,7 @@ public class SubscriptionController {
     @Operation(summary = "Отримати всі абонементи конкретної дитини")
     @GetMapping("/child/{childId}")
     public ResponseEntity<List<SubscriptionResponse>> getByChildId(
-        @PathVariable UUID childId) { // ВИПРАВЛЕНО: прибрано @RequestBody
+        @PathVariable UUID childId) {
         return ResponseEntity.ok(subscriptionService.getChildSubscriptions(childId));
     }
 

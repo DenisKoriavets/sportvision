@@ -2,15 +2,20 @@ package com.github.deniskoriavets.sportvision.service;
 
 import com.github.deniskoriavets.sportvision.dto.ChildRequest;
 import com.github.deniskoriavets.sportvision.dto.ChildResponse;
+import com.github.deniskoriavets.sportvision.dto.ChildSearchCriteria;
 import com.github.deniskoriavets.sportvision.entity.Child;
+import com.github.deniskoriavets.sportvision.entity.enums.Role;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.ChildMapper;
 import com.github.deniskoriavets.sportvision.repository.ChildRepository;
+import com.github.deniskoriavets.sportvision.repository.specification.ChildSpecifications;
 import com.github.deniskoriavets.sportvision.security.SecurityFacade;
 import com.github.deniskoriavets.sportvision.service.interfaces.ChildService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,5 +73,25 @@ public class ChildServiceImpl implements ChildService {
             throw new AccessDeniedException("Ви не маєте доступу до даних цієї дитини");
         }
         return child;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ChildResponse> searchChildren(ChildSearchCriteria criteria, Pageable pageable) {
+        var currentUser = securityFacade.getCurrentUser();
+
+        ChildSearchCriteria finalCriteria = criteria;
+
+        if (currentUser.getRole() == Role.PARENT) {
+            finalCriteria = new ChildSearchCriteria(
+                criteria.query(),
+                criteria.groupId(),
+                currentUser.getId()
+            );
+        }
+
+        var spec = ChildSpecifications.build(finalCriteria);
+        return childRepository.findAll(spec, pageable)
+            .map(childMapper::toResponse);
     }
 }

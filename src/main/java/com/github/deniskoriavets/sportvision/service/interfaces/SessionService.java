@@ -3,9 +3,12 @@ package com.github.deniskoriavets.sportvision.service.interfaces;
 import com.github.deniskoriavets.sportvision.dto.SessionGenerationRequest;
 import com.github.deniskoriavets.sportvision.dto.SessionRequest;
 import com.github.deniskoriavets.sportvision.dto.SessionResponse;
+import com.github.deniskoriavets.sportvision.dto.SessionSearchCriteria;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface SessionService {
     void generateSessions(SessionGenerationRequest request);
@@ -15,4 +18,6 @@ public interface SessionService {
     void cancelSession(UUID sessionId, String reason);
     
     List<SessionResponse> getSessionsByGroup(UUID groupId, LocalDate start, LocalDate end);
+
+    Page<SessionResponse> searchSessions(SessionSearchCriteria criteria, Pageable pageable);
 }

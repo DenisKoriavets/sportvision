@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,5 +67,13 @@ public class SessionController {
             @RequestBody @Valid List<ChildAttendanceDto> attendances) {
         attendanceService.markBulkAttendance(new BulkAttendanceRequest(id, attendances));
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    @Operation(summary = "Пошук та фільтрація занять з пагінацією")
+    public ResponseEntity<Page<SessionResponse>> searchSessions(
+        SessionSearchCriteria criteria,
+        Pageable pageable) {
+        return ResponseEntity.ok(sessionService.searchSessions(criteria, pageable));
     }
 }
