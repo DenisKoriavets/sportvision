@@ -18,6 +18,6 @@ public interface SessionMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "cancelReason", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "isDeleted", ignore = true)
     Session toEntity(SessionRequest request);
 }

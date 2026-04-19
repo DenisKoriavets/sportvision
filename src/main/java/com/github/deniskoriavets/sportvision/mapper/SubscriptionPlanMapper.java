@@ -5,8 +5,9 @@ import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanResponse;
 import com.github.deniskoriavets.sportvision.entity.SubscriptionPlan;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SubscriptionPlanMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -17,5 +18,6 @@ public interface SubscriptionPlanMapper {
 
     @Mapping(source = "section.name", target = "sectionName")
     @Mapping(source = "section.id", target = "sectionId")
+    @Mapping(target = "sessionCount", source = "sessionsCount")
     SubscriptionPlanResponse toResponse(SubscriptionPlan subscriptionPlan);
 }

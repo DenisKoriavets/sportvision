@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public record SessionResponse(
     UUID id,
+    UUID groupId,
     LocalDate date,
     LocalTime startTime,
     LocalTime endTime,
