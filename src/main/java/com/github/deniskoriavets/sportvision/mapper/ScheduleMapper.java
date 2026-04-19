@@ -16,11 +16,11 @@ public interface ScheduleMapper {
 
     @Mapping(target = "group", ignore = true)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "isDeleted", ignore = true)
     Schedule toEntity(ScheduleRequest request);
 
     @Mapping(target = "group", ignore = true)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "isDeleted", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     void updateEntity(ScheduleRequest request, @MappingTarget Schedule schedule);
 }
