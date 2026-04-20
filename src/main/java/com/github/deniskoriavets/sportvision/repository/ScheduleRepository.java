@@ -14,11 +14,10 @@ public interface ScheduleRepository extends JpaRepository<Schedule, UUID> {
     List<Schedule> findAllByGroupId(UUID groupId);
 
     @Query("""
-        SELECT COUNT(s) > 0 FROM Schedule s 
+        SELECT COUNT(s) > 0 FROM Schedule s
         JOIN s.group g 
         WHERE g.coach.id = :coachId 
         AND s.dayOfWeek = :dayOfWeek 
-        AND s.isDeleted = false 
         AND ((s.startTime < :endTime AND s.endTime > :startTime))
     """)
     boolean existsCoachConflict(

@@ -6,6 +6,7 @@ import com.github.deniskoriavets.sportvision.dto.GroupResponse;
 import com.github.deniskoriavets.sportvision.dto.GroupSearchCriteria;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.GroupMapper;
+import com.github.deniskoriavets.sportvision.repository.ChildRepository;
 import com.github.deniskoriavets.sportvision.repository.GroupRepository;
 import com.github.deniskoriavets.sportvision.repository.ParentRepository;
 import com.github.deniskoriavets.sportvision.repository.SectionRepository;
@@ -31,6 +32,8 @@ public class GroupServiceImpl implements GroupService {
 
     private final ParentRepository parentRepository;
 
+    private final ChildRepository childRepository;
+
     @Override
     @Transactional
     public GroupResponse createGroup(GroupRequest groupRequest) {
@@ -46,21 +49,25 @@ public class GroupServiceImpl implements GroupService {
             entity.setCoach(coach);
         }
 
-        return groupMapper.toResponse(groupRepository.save(entity));
+        return groupMapper.toResponse(groupRepository.save(entity), 0);
     }
 
     @Override
     public Page<GroupResponse> getGroups(GroupSearchCriteria criteria, Pageable pageable) {
         var spec = GroupSpecifications.build(criteria);
-        var groupPage = groupRepository.findAll(spec, pageable);
-        return groupPage.map(groupMapper::toResponse);
+        return groupRepository.findAll(spec, pageable)
+            .map(group -> groupMapper.toResponse(
+                group,
+                childRepository.countByGroupId(group.getId())
+            ));
     }
 
     @Override
     public GroupResponse getGroupById(UUID id) {
-        return groupRepository.findById(id)
-            .map(groupMapper::toResponse)
+        var group = groupRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Group not found with id: " + id));
+
+        return groupMapper.toResponse(group, childRepository.countByGroupId(group.getId()));
     }
 
     @Override
@@ -91,8 +98,8 @@ public class GroupServiceImpl implements GroupService {
             entity.setCoach(null);
         }
 
-        return groupMapper.toResponse(groupRepository.save(entity));
-    }
+        var savedGroup = groupRepository.save(entity);
+        return groupMapper.toResponse(savedGroup, childRepository.countByGroupId(savedGroup.getId()));    }
 
     @Override
     @Transactional

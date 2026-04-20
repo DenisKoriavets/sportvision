@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class SectionServiceImpl implements SectionService {
 
     private final SectionRepository sectionRepository;
-
     private final SectionMapper sectionMapper;
 
     @Override
@@ -49,9 +48,6 @@ public class SectionServiceImpl implements SectionService {
     @Override
     @Transactional
     public SectionResponse updateSection(UUID id, SectionRequest sectionRequest) {
-        if (!sectionRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Section not found with id: " + id);
-        }
         var section = sectionRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + id));
         section.setName(sectionRequest.name());
@@ -62,9 +58,9 @@ public class SectionServiceImpl implements SectionService {
     @Override
     @Transactional
     public void deleteSection(UUID id) {
-        if (!sectionRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Section not found with id: " + id);
-        }
-        sectionRepository.deleteById(id);
+        var section = sectionRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + id));
+
+        sectionRepository.delete(section);
     }
 }

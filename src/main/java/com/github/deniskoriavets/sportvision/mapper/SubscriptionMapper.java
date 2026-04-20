@@ -14,10 +14,4 @@ public interface SubscriptionMapper {
     @Mapping(target = "planId", source = "subscriptionPlan.id")
     @Mapping(target = "planName", source = "subscriptionPlan.name")
     SubscriptionResponse toResponse(Subscription subscription);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "child", ignore = true)
-    @Mapping(target = "subscriptionPlan", ignore = true)
-    @Mapping(target = "isDeleted", ignore = true)
-    Subscription toEntity(SubscriptionRequest subscriptionRequest);
 }

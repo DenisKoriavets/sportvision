@@ -1,13 +1,19 @@
 package com.github.deniskoriavets.sportvision.service;
 
+import com.github.deniskoriavets.sportvision.dto.AttendanceResponse;
 import com.github.deniskoriavets.sportvision.dto.ChildRequest;
 import com.github.deniskoriavets.sportvision.dto.ChildResponse;
 import com.github.deniskoriavets.sportvision.dto.ChildSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
+import com.github.deniskoriavets.sportvision.mapper.AttendanceMapper;
 import com.github.deniskoriavets.sportvision.mapper.ChildMapper;
+import com.github.deniskoriavets.sportvision.mapper.SubscriptionMapper;
+import com.github.deniskoriavets.sportvision.repository.AttendanceRepository;
 import com.github.deniskoriavets.sportvision.repository.ChildRepository;
+import com.github.deniskoriavets.sportvision.repository.SubscriptionRepository;
 import com.github.deniskoriavets.sportvision.repository.specification.ChildSpecifications;
 import com.github.deniskoriavets.sportvision.security.SecurityFacade;
 import com.github.deniskoriavets.sportvision.service.interfaces.ChildService;
@@ -24,9 +30,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ChildServiceImpl implements ChildService {
+
     private final ChildRepository childRepository;
     private final ChildMapper childMapper;
     private final SecurityFacade securityFacade;
+    private final AttendanceRepository attendanceRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final AttendanceMapper attendanceMapper;
+    private final SubscriptionMapper subscriptionMapper;
 
     @Override
     @Transactional
@@ -93,5 +104,25 @@ public class ChildServiceImpl implements ChildService {
         var spec = ChildSpecifications.build(finalCriteria);
         return childRepository.findAll(spec, pageable)
             .map(childMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AttendanceResponse> getChildAttendance(UUID childId) {
+        getChildIfOwner(childId);
+
+        return attendanceRepository.findAllByChildId(childId).stream()
+            .map(attendanceMapper::toResponse)
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SubscriptionResponse> getChildSubscriptions(UUID childId) {
+        getChildIfOwner(childId);
+
+        return subscriptionRepository.findAllByChildId(childId).stream()
+            .map(subscriptionMapper::toResponse)
+            .toList();
     }
 }

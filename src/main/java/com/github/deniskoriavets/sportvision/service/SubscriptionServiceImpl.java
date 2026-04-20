@@ -3,6 +3,7 @@ package com.github.deniskoriavets.sportvision.service;
 import com.github.deniskoriavets.sportvision.dto.SubscriptionRequest;
 import com.github.deniskoriavets.sportvision.dto.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.entity.Child;
+import com.github.deniskoriavets.sportvision.entity.Subscription;
 import com.github.deniskoriavets.sportvision.entity.enums.SubscriptionStatus;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.SubscriptionMapper;
@@ -38,26 +39,29 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         var plan = subscriptionPlanRepository.findById(subscriptionRequest.planId())
             .orElseThrow(() -> new ResourceNotFoundException("Subscription plan not found"));
 
-        if (plan.isActive() &&
-            !subscriptionRepository.existsByChildIdAndSubscriptionPlanSectionIdAndStatusIn(
-                child.getId(), plan.getSection().getId(), List.of(
-                    SubscriptionStatus.ACTIVE, SubscriptionStatus.PENDING_PAYMENT))) {
-            var subscription = subscriptionMapper.toEntity(subscriptionRequest);
-            subscription.setStatus(SubscriptionStatus.PENDING_PAYMENT);
-            subscription.setStartDate(LocalDate.now());
-            subscription.setEndDate(LocalDate.now().plusDays(plan.getValidityDays()));
-            subscription.setTotalSessions(plan.getSessionsCount());
-            subscription.setRemainingSessions(plan.getSessionsCount());
-            subscription.setChild(child);
-            subscription.setSubscriptionPlan(plan);
-            return subscriptionMapper.toResponse(subscriptionRepository.save(subscription));
-        }
         if (!plan.isActive()) {
             throw new IllegalStateException("Subscription plan is not active");
-        } else {
+        }
+
+        if (subscriptionRepository.existsByChildIdAndSubscriptionPlanSectionIdAndStatusIn(
+            child.getId(), plan.getSection().getId(), List.of(
+                SubscriptionStatus.ACTIVE, SubscriptionStatus.PENDING_PAYMENT))) {
             throw new IllegalStateException(
                 "Child already has an active or pending subscription for this section");
         }
+
+        var subscription = Subscription.builder()
+            .child(child)
+            .subscriptionPlan(plan)
+            .totalSessions(plan.getSessionsCount())
+            .remainingSessions(plan.getSessionsCount())
+            .status(SubscriptionStatus.PENDING_PAYMENT)
+            .startDate(LocalDate.now())
+            .endDate(LocalDate.now().plusDays(plan.getValidityDays()))
+            .build();
+
+        var savedSubscription = subscriptionRepository.save(subscription);
+        return subscriptionMapper.toResponse(savedSubscription);
     }
 
     @Override

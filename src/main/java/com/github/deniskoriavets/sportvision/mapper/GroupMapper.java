@@ -13,8 +13,8 @@ public interface GroupMapper {
     @Mapping(source = "section.id", target = "sectionId")
     @Mapping(source = "section.name", target = "sectionName")
     @Mapping(target = "coachName", source = "coach")
-    @Mapping(target = "currentOccupancy", ignore = true)
-    GroupResponse toResponse(Group group);
+    @Mapping(target = "currentOccupancy", source = "currentOccupancy")
+    GroupResponse toResponse(Group group, Integer currentOccupancy);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "section", ignore = true)

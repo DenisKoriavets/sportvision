@@ -1,8 +1,10 @@
 package com.github.deniskoriavets.sportvision.service.interfaces;
 
+import com.github.deniskoriavets.sportvision.dto.AttendanceResponse;
 import com.github.deniskoriavets.sportvision.dto.ChildRequest;
 import com.github.deniskoriavets.sportvision.dto.ChildResponse;
 import com.github.deniskoriavets.sportvision.dto.ChildSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.SubscriptionResponse;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -20,4 +22,8 @@ public interface ChildService {
     void deleteChild(UUID id);
 
     Page<ChildResponse> searchChildren(ChildSearchCriteria criteria, Pageable pageable);
+
+    List<AttendanceResponse> getChildAttendance(UUID childId);
+
+    public List<SubscriptionResponse> getChildSubscriptions(UUID childId);
 }

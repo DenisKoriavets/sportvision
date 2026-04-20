@@ -1,8 +1,10 @@
 package com.github.deniskoriavets.sportvision.controller;
 
+import com.github.deniskoriavets.sportvision.dto.AttendanceResponse;
 import com.github.deniskoriavets.sportvision.dto.ChildRequest;
 import com.github.deniskoriavets.sportvision.dto.ChildResponse;
 import com.github.deniskoriavets.sportvision.dto.ChildSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.service.interfaces.ChildService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -62,5 +65,19 @@ public class ChildController {
         ChildSearchCriteria criteria,
         Pageable pageable) {
         return ResponseEntity.ok(childService.searchChildren(criteria, pageable));
+    }
+
+    @GetMapping("/{id}/attendance")
+    @Operation(summary = "Отримати історію відвідувань дитини")
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    public ResponseEntity<List<AttendanceResponse>> getChildAttendance(@PathVariable UUID id) {
+        return ResponseEntity.ok(childService.getChildAttendance(id));
+    }
+
+    @GetMapping("/{id}/subscriptions")
+    @Operation(summary = "Отримати всі абонементи дитини")
+    @PreAuthorize("hasAnyRole('PARENT', 'ADMIN')")
+    public ResponseEntity<List<SubscriptionResponse>> getChildSubscriptions(@PathVariable UUID id) {
+        return ResponseEntity.ok(childService.getChildSubscriptions(id));
     }
 }

@@ -34,7 +34,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         var group = groupRepository.findById(enrollmentRequest.groupId())
             .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
         int childAge = Period.between(child.getBirthDate(), LocalDate.now()).getYears();
-        if (childAge < group.getAgeMin() || childAge > group.getAgeMax()) {
+
+        boolean isTooYoung = group.getAgeMin() != null && childAge < group.getAgeMin();
+        boolean isTooOld = group.getAgeMax() != null && childAge > group.getAgeMax();
+
+        if (isTooYoung || isTooOld) {
             throw new IllegalStateException(
                 "Child does not meet the age requirements for this group");
         }

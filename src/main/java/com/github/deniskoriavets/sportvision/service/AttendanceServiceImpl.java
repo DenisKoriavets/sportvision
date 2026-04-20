@@ -26,11 +26,17 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional
     public void markBulkAttendance(BulkAttendanceRequest request) {
         var currentUser = securityFacade.getCurrentUser();
         var session = sessionRepository.findById(request.sessionId())
             .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+
         for (var attendance : request.attendances()) {
+            if (attendanceRepository.existsBySessionIdAndChildId(session.getId(), attendance.childId())) {
+                continue;
+            }
+
             var child = childRepository.findById(attendance.childId())
                 .orElseThrow(() -> new IllegalArgumentException("Child not found"));
 
@@ -43,7 +49,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .build();
             attendanceRepository.save(attendanceEntity);
             eventPublisher.publishEvent(
-                new AttendanceMarkedEvent(child.getId(), request.sessionId(), attendance.status()));
+                new AttendanceMarkedEvent(child.getId(), session.getId(), attendance.status()));
         }
     }
 }
