@@ -9,7 +9,7 @@ public class AgePeriodValidator implements ConstraintValidator<ValidAgePeriod, G
     @Override
     public boolean isValid(GroupRequest request, ConstraintValidatorContext context) {
         if (request == null) return true;
-        
+        if (request.ageMin() == null || request.ageMax() == null) return true;
         return request.ageMin() <= request.ageMax();
     }
 }
