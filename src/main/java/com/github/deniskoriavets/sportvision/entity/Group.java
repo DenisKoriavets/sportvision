@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -71,6 +72,9 @@ public class Group {
     @Builder.Default
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Schedule> schedules = new ArrayList<>();
+
+    @Formula("(SELECT count(*) FROM children c WHERE c.group_id = id AND c.is_deleted = false)")
+    private Integer currentOccupancy;
 
     public void addSchedule(Schedule schedule) {
         schedules.add(schedule);

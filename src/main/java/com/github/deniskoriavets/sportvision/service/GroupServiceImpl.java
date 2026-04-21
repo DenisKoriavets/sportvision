@@ -49,25 +49,21 @@ public class GroupServiceImpl implements GroupService {
             entity.setCoach(coach);
         }
 
-        return groupMapper.toResponse(groupRepository.save(entity), 0);
+        return groupMapper.toResponseWithOccupancy(groupRepository.save(entity), 0);
     }
 
     @Override
     public Page<GroupResponse> getGroups(GroupSearchCriteria criteria, Pageable pageable) {
         var spec = GroupSpecifications.build(criteria);
         return groupRepository.findAll(spec, pageable)
-            .map(group -> groupMapper.toResponse(
-                group,
-                childRepository.countByGroupId(group.getId())
-            ));
+            .map(groupMapper::toResponse);
     }
 
     @Override
     public GroupResponse getGroupById(UUID id) {
         var group = groupRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Group not found with id: " + id));
-
-        return groupMapper.toResponse(group, childRepository.countByGroupId(group.getId()));
+        return groupMapper.toResponse(group);
     }
 
     @Override
@@ -99,7 +95,8 @@ public class GroupServiceImpl implements GroupService {
         }
 
         var savedGroup = groupRepository.save(entity);
-        return groupMapper.toResponse(savedGroup, childRepository.countByGroupId(savedGroup.getId()));    }
+        return groupMapper.toResponse(savedGroup);
+    }
 
     @Override
     @Transactional

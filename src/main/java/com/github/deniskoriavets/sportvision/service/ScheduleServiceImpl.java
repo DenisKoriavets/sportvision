@@ -50,7 +50,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public void deleteSchedule(UUID scheduleId) {
-        scheduleRepository.deleteById(scheduleId);
+    @Transactional
+    public void deleteSchedule(UUID id) {
+        var schedule = scheduleRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id: " + id));
+
+        scheduleRepository.delete(schedule);
     }
 }
