@@ -5,6 +5,7 @@ import com.github.deniskoriavets.sportvision.dto.request.SubscriptionRequest;
 import com.github.deniskoriavets.sportvision.entity.*;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
 import com.github.deniskoriavets.sportvision.repository.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,11 @@ class SubscriptionControllerIntegrationTest extends BaseIntegrationTest {
     @Autowired private SubscriptionPlanRepository planRepository;
     @Autowired private com.github.deniskoriavets.sportvision.security.JwtService jwtService;
     @Autowired private ObjectMapper objectMapper;
+
+    @BeforeEach
+    void setUp() {
+        truncateAll();
+    }
 
     @Test
     @DisplayName("Успішна покупка абонемента")

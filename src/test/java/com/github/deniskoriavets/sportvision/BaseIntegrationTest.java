@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -14,8 +15,20 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 @Import(TestcontainersConfiguration.class)
 public abstract class BaseIntegrationTest {
+
     @Autowired
     private ParentRepository parentRepository;
+
+    @Autowired
+    protected JdbcTemplate jdbcTemplate;
+
+    protected void truncateAll() {
+        jdbcTemplate.execute(
+            "TRUNCATE TABLE payments, subscriptions, subscription_plans, " +
+                "attendances, sessions, schedules, children, groups, sections, " +
+                "refresh_tokens, verification_tokens, parent_notification_preferences, parents CASCADE"
+        );
+    }
 
     protected Parent createParent(String email, Role role) {
         return parentRepository.save(Parent.builder()

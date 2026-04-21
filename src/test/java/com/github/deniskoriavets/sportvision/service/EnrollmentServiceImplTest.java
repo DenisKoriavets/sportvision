@@ -7,81 +7,151 @@ import com.github.deniskoriavets.sportvision.dto.request.EnrollmentRequest;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import com.github.deniskoriavets.sportvision.entity.Group;
 import com.github.deniskoriavets.sportvision.entity.Parent;
+import com.github.deniskoriavets.sportvision.entity.Section;
+import com.github.deniskoriavets.sportvision.entity.enums.SubscriptionStatus;
 import com.github.deniskoriavets.sportvision.repository.ChildRepository;
 import com.github.deniskoriavets.sportvision.repository.GroupRepository;
+import com.github.deniskoriavets.sportvision.repository.SubscriptionRepository;
 import com.github.deniskoriavets.sportvision.security.SecurityFacade;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 @ExtendWith(MockitoExtension.class)
 class EnrollmentServiceImplTest {
 
     @Mock private GroupRepository groupRepository;
     @Mock private ChildRepository childRepository;
+    @Mock private SubscriptionRepository subscriptionRepository;
     @Mock private SecurityFacade securityFacade;
 
     @InjectMocks private EnrollmentServiceImpl enrollmentService;
 
-    @Test
-    void enrollChild_ShouldThrowException_WhenAgeIsTooLow() {
-        UUID childId = UUID.randomUUID();
-        UUID parentId = UUID.randomUUID();
-        UUID groupId = UUID.randomUUID();
-        EnrollmentRequest request = new EnrollmentRequest(childId, groupId);
-
+    private Child buildChild(UUID parentId, int ageYears) {
         Parent parent = new Parent();
         parent.setId(parentId);
-
         Child child = new Child();
         child.setParent(parent);
-        child.setBirthDate(LocalDate.now().minusYears(5));
+        child.setBirthDate(LocalDate.now().minusYears(ageYears));
+        return child;
+    }
 
+    private Group buildGroup(int ageMin, int ageMax, int maxCapacity) {
+        Section section = new Section();
+        section.setId(UUID.randomUUID());
         Group group = new Group();
-        group.setId(groupId);
-        group.setAgeMin(7);
-
-        when(childRepository.findById(childId)).thenReturn(Optional.of(child));
-        when(securityFacade.getCurrentUserId()).thenReturn(parentId);
-        when(groupRepository.findById(groupId)).thenReturn(Optional.of(group));
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class,
-            () -> enrollmentService.enrollChild(request));
-        assertTrue(exception.getMessage().contains("age requirements"));
+        group.setId(UUID.randomUUID());
+        group.setAgeMin(ageMin);
+        group.setAgeMax(ageMax);
+        group.setMaxCapacity(maxCapacity);
+        group.setSection(section);
+        return group;
     }
 
     @Test
-    void enrollChild_ShouldThrowException_WhenGroupIsFull() {
-        UUID childId = UUID.randomUUID();
+    @DisplayName("Успішний запис дитини в групу")
+    void enrollChild_Success() {
         UUID parentId = UUID.randomUUID();
-        UUID groupId = UUID.randomUUID();
-        EnrollmentRequest request = new EnrollmentRequest(childId, groupId);
-
-        Parent parent = new Parent();
-        parent.setId(parentId);
-
-        Child child = new Child();
-        child.setParent(parent);
-        child.setBirthDate(LocalDate.now().minusYears(10));
-
-        Group group = new Group();
-        group.setId(groupId);
-        group.setAgeMin(5);
-        group.setAgeMax(12);
-        group.setMaxCapacity(10);
+        UUID childId = UUID.randomUUID();
+        Child child = buildChild(parentId, 10);
+        Group group = buildGroup(5, 15, 10);
 
         when(childRepository.findById(childId)).thenReturn(Optional.of(child));
         when(securityFacade.getCurrentUserId()).thenReturn(parentId);
-        when(groupRepository.findById(groupId)).thenReturn(Optional.of(group));
-        when(childRepository.countByGroupId(groupId)).thenReturn(10);
+        when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
+        when(childRepository.countByGroupId(group.getId())).thenReturn(5);
+        when(subscriptionRepository.existsByChildIdAndSubscriptionPlanSectionIdAndStatus(
+            any(), any(), eq(SubscriptionStatus.ACTIVE))).thenReturn(true);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class,
-            () -> enrollmentService.enrollChild(request));
-        assertEquals("Group is at full capacity", exception.getMessage());
+        assertDoesNotThrow(() -> enrollmentService.enrollChild(new EnrollmentRequest(childId, group.getId())));
+        verify(childRepository).save(child);
+    }
+
+    @Test
+    @DisplayName("Помилка при занадто малому віці дитини")
+    void enrollChild_ThrowsException_WhenTooYoung() {
+        UUID parentId = UUID.randomUUID();
+        UUID childId = UUID.randomUUID();
+        Child child = buildChild(parentId, 5);
+        Group group = buildGroup(7, 12, 10);
+
+        when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+        when(securityFacade.getCurrentUserId()).thenReturn(parentId);
+        when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
+
+        assertThrows(IllegalStateException.class,
+            () -> enrollmentService.enrollChild(new EnrollmentRequest(childId, group.getId())));
+    }
+
+    @Test
+    @DisplayName("Помилка при занадто великому віці дитини")
+    void enrollChild_ThrowsException_WhenTooOld() {
+        UUID parentId = UUID.randomUUID();
+        UUID childId = UUID.randomUUID();
+        Child child = buildChild(parentId, 16);
+        Group group = buildGroup(7, 12, 10);
+
+        when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+        when(securityFacade.getCurrentUserId()).thenReturn(parentId);
+        when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
+
+        assertThrows(IllegalStateException.class,
+            () -> enrollmentService.enrollChild(new EnrollmentRequest(childId, group.getId())));
+    }
+
+    @Test
+    @DisplayName("Помилка коли група заповнена")
+    void enrollChild_ThrowsException_WhenGroupFull() {
+        UUID parentId = UUID.randomUUID();
+        UUID childId = UUID.randomUUID();
+        Child child = buildChild(parentId, 10);
+        Group group = buildGroup(5, 15, 10);
+
+        when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+        when(securityFacade.getCurrentUserId()).thenReturn(parentId);
+        when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
+        when(childRepository.countByGroupId(group.getId())).thenReturn(10);
+
+        assertThrows(IllegalStateException.class,
+            () -> enrollmentService.enrollChild(new EnrollmentRequest(childId, group.getId())));
+    }
+
+    @Test
+    @DisplayName("Помилка коли немає активного абонементу")
+    void enrollChild_ThrowsException_WhenNoActiveSubscription() {
+        UUID parentId = UUID.randomUUID();
+        UUID childId = UUID.randomUUID();
+        Child child = buildChild(parentId, 10);
+        Group group = buildGroup(5, 15, 10);
+
+        when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+        when(securityFacade.getCurrentUserId()).thenReturn(parentId);
+        when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
+        when(childRepository.countByGroupId(group.getId())).thenReturn(5);
+        when(subscriptionRepository.existsByChildIdAndSubscriptionPlanSectionIdAndStatus(
+            any(), any(), eq(SubscriptionStatus.ACTIVE))).thenReturn(false);
+
+        assertThrows(IllegalStateException.class,
+            () -> enrollmentService.enrollChild(new EnrollmentRequest(childId, group.getId())));
+    }
+
+    @Test
+    @DisplayName("Помилка доступу коли не власник дитини")
+    void enrollChild_ThrowsAccessDenied_WhenNotOwner() {
+        UUID childId = UUID.randomUUID();
+        Child child = buildChild(UUID.randomUUID(), 10);
+
+        when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+        when(securityFacade.getCurrentUserId()).thenReturn(UUID.randomUUID());
+
+        assertThrows(AccessDeniedException.class,
+            () -> enrollmentService.enrollChild(new EnrollmentRequest(childId, UUID.randomUUID())));
     }
 }
