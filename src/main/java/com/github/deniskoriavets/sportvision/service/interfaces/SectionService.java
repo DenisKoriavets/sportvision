@@ -1,8 +1,8 @@
 package com.github.deniskoriavets.sportvision.service.interfaces;
 
-import com.github.deniskoriavets.sportvision.dto.SectionRequest;
-import com.github.deniskoriavets.sportvision.dto.SectionResponse;
-import com.github.deniskoriavets.sportvision.dto.SectionSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.request.SectionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SectionResponse;
+import com.github.deniskoriavets.sportvision.dto.criteria.SectionSearchCriteria;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

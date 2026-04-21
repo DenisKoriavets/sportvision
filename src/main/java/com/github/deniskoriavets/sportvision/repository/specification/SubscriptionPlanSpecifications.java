@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.repository.specification;
 
-import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.criteria.SubscriptionPlanSearchCriteria;
 import com.github.deniskoriavets.sportvision.entity.SubscriptionPlan;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;

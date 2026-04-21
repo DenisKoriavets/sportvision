@@ -1,9 +1,9 @@
 package com.github.deniskoriavets.sportvision.service.interfaces;
 
-import com.github.deniskoriavets.sportvision.dto.SessionGenerationRequest;
-import com.github.deniskoriavets.sportvision.dto.SessionRequest;
-import com.github.deniskoriavets.sportvision.dto.SessionResponse;
-import com.github.deniskoriavets.sportvision.dto.SessionSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.request.SessionGenerationRequest;
+import com.github.deniskoriavets.sportvision.dto.request.SessionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SessionResponse;
+import com.github.deniskoriavets.sportvision.dto.criteria.SessionSearchCriteria;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;

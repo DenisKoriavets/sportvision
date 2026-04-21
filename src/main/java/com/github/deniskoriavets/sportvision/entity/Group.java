@@ -49,7 +49,7 @@ public class Group {
     private Section section;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coach_id", nullable = false)
+    @JoinColumn(name = "coach_id")
     @ToString.Include
     private Parent coach;
 

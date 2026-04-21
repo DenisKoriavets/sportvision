@@ -1,8 +1,8 @@
 package com.github.deniskoriavets.sportvision.service.interfaces;
 
-import com.github.deniskoriavets.sportvision.dto.AuthResponse;
-import com.github.deniskoriavets.sportvision.dto.LoginRequest;
-import com.github.deniskoriavets.sportvision.dto.RegisterRequest;
+import com.github.deniskoriavets.sportvision.dto.response.AuthResponse;
+import com.github.deniskoriavets.sportvision.dto.request.LoginRequest;
+import com.github.deniskoriavets.sportvision.dto.request.RegisterRequest;
 
 public interface AuthService {
     void register(RegisterRequest registerRequest);

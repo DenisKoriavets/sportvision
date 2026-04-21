@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.service;
 
-import com.github.deniskoriavets.sportvision.dto.SessionGenerationRequest;
+import com.github.deniskoriavets.sportvision.dto.request.SessionGenerationRequest;
 import com.github.deniskoriavets.sportvision.entity.Group;
 import com.github.deniskoriavets.sportvision.entity.Schedule;
 import com.github.deniskoriavets.sportvision.entity.enums.DayOfWeek;
@@ -17,11 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

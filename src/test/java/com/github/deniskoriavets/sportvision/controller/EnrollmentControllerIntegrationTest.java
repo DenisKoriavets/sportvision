@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.BaseIntegrationTest;
-import com.github.deniskoriavets.sportvision.dto.EnrollmentRequest;
+import com.github.deniskoriavets.sportvision.dto.request.EnrollmentRequest;
 import com.github.deniskoriavets.sportvision.entity.*;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
 import com.github.deniskoriavets.sportvision.repository.*;
@@ -68,7 +68,7 @@ class EnrollmentControllerIntegrationTest extends BaseIntegrationTest {
         String token = "Bearer " + jwtService.generateAccessToken(parent);
         EnrollmentRequest request = new EnrollmentRequest(child.getId(), group.getId());
 
-        mockMvc.perform(post("/api/v1/enrollments/enroll")
+        mockMvc.perform(post("/api/v1/enrollments")
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))

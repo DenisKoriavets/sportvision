@@ -1,7 +1,6 @@
 package com.github.deniskoriavets.sportvision.validation;
 
-import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanRequest;
-import com.github.deniskoriavets.sportvision.entity.SubscriptionPlan;
+import com.github.deniskoriavets.sportvision.dto.request.SubscriptionPlanRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

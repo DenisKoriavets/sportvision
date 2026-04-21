@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.BaseIntegrationTest;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionRequest;
+import com.github.deniskoriavets.sportvision.dto.request.SubscriptionRequest;
 import com.github.deniskoriavets.sportvision.entity.*;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
 import com.github.deniskoriavets.sportvision.repository.*;

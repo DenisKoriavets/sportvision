@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.mapper;
 
-import com.github.deniskoriavets.sportvision.dto.SectionRequest;
-import com.github.deniskoriavets.sportvision.dto.SectionResponse;
+import com.github.deniskoriavets.sportvision.dto.request.SectionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SectionResponse;
 import com.github.deniskoriavets.sportvision.entity.Section;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

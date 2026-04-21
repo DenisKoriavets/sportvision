@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.service;
 
-import com.github.deniskoriavets.sportvision.dto.EnrollmentRequest;
+import com.github.deniskoriavets.sportvision.dto.request.EnrollmentRequest;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import com.github.deniskoriavets.sportvision.entity.enums.SubscriptionStatus;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
@@ -58,7 +58,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     @Override
-    @Transactional
     public void unenrollChild(EnrollmentRequest enrollmentRequest) {
         var child = getChildIfOwner(enrollmentRequest.childId());
         child.setGroup(null);

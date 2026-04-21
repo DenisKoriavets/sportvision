@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.controller;
 
-import com.github.deniskoriavets.sportvision.dto.SubscriptionRequest;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionResponse;
+import com.github.deniskoriavets.sportvision.dto.request.SubscriptionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.service.interfaces.SubscriptionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

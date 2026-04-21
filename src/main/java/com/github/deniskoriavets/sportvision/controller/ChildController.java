@@ -1,10 +1,10 @@
 package com.github.deniskoriavets.sportvision.controller;
 
-import com.github.deniskoriavets.sportvision.dto.AttendanceResponse;
-import com.github.deniskoriavets.sportvision.dto.ChildRequest;
-import com.github.deniskoriavets.sportvision.dto.ChildResponse;
-import com.github.deniskoriavets.sportvision.dto.ChildSearchCriteria;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionResponse;
+import com.github.deniskoriavets.sportvision.dto.response.AttendanceResponse;
+import com.github.deniskoriavets.sportvision.dto.request.ChildRequest;
+import com.github.deniskoriavets.sportvision.dto.response.ChildResponse;
+import com.github.deniskoriavets.sportvision.dto.criteria.ChildSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.response.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.service.interfaces.ChildService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

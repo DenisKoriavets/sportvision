@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.service;
 
-import com.github.deniskoriavets.sportvision.dto.ParentResponse;
-import com.github.deniskoriavets.sportvision.dto.ParentUpdateRequest;
+import com.github.deniskoriavets.sportvision.dto.response.ParentResponse;
+import com.github.deniskoriavets.sportvision.dto.request.ParentUpdateRequest;
 import com.github.deniskoriavets.sportvision.mapper.ParentMapper;
 import com.github.deniskoriavets.sportvision.repository.ParentRepository;
 import com.github.deniskoriavets.sportvision.security.SecurityFacade;

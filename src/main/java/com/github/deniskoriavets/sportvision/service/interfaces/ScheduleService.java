@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.service.interfaces;
 
-import com.github.deniskoriavets.sportvision.dto.ScheduleRequest;
-import com.github.deniskoriavets.sportvision.dto.ScheduleResponse;
+import com.github.deniskoriavets.sportvision.dto.request.ScheduleRequest;
+import com.github.deniskoriavets.sportvision.dto.response.ScheduleResponse;
 import java.util.List;
 import java.util.UUID;
 

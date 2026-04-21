@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.mapper;
 
-import com.github.deniskoriavets.sportvision.dto.SessionRequest;
-import com.github.deniskoriavets.sportvision.dto.SessionResponse;
+import com.github.deniskoriavets.sportvision.dto.request.SessionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SessionResponse;
 import com.github.deniskoriavets.sportvision.entity.Session;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

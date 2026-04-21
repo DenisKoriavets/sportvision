@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.service.interfaces;
 
-import com.github.deniskoriavets.sportvision.dto.SubscriptionRequest;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionResponse;
+import com.github.deniskoriavets.sportvision.dto.request.SubscriptionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SubscriptionResponse;
 import java.util.List;
 import java.util.UUID;
 

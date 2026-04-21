@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.service;
 
-import com.github.deniskoriavets.sportvision.dto.SubscriptionRequest;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionResponse;
+import com.github.deniskoriavets.sportvision.dto.request.SubscriptionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import com.github.deniskoriavets.sportvision.entity.Parent;
 import com.github.deniskoriavets.sportvision.entity.Section;

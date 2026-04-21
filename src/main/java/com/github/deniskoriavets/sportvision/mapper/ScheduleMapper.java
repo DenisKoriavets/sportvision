@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.mapper;
 
-import com.github.deniskoriavets.sportvision.dto.ScheduleRequest;
-import com.github.deniskoriavets.sportvision.dto.ScheduleResponse;
+import com.github.deniskoriavets.sportvision.dto.request.ScheduleRequest;
+import com.github.deniskoriavets.sportvision.dto.response.ScheduleResponse;
 import com.github.deniskoriavets.sportvision.entity.Schedule;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

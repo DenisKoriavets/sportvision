@@ -1,8 +1,8 @@
 package com.github.deniskoriavets.sportvision.controller;
 
-import com.github.deniskoriavets.sportvision.dto.SectionRequest;
-import com.github.deniskoriavets.sportvision.dto.SectionResponse;
-import com.github.deniskoriavets.sportvision.dto.SectionSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.request.SectionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SectionResponse;
+import com.github.deniskoriavets.sportvision.dto.criteria.SectionSearchCriteria;
 import com.github.deniskoriavets.sportvision.service.interfaces.SectionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

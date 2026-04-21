@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.controller;
 
-import com.github.deniskoriavets.sportvision.dto.ScheduleRequest;
-import com.github.deniskoriavets.sportvision.dto.ScheduleResponse;
+import com.github.deniskoriavets.sportvision.dto.request.ScheduleRequest;
+import com.github.deniskoriavets.sportvision.dto.response.ScheduleResponse;
 import com.github.deniskoriavets.sportvision.service.interfaces.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

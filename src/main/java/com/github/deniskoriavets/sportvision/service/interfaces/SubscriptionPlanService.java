@@ -1,9 +1,8 @@
 package com.github.deniskoriavets.sportvision.service.interfaces;
 
-import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanRequest;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanResponse;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanSearchCriteria;
-import java.util.List;
+import com.github.deniskoriavets.sportvision.dto.request.SubscriptionPlanRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SubscriptionPlanResponse;
+import com.github.deniskoriavets.sportvision.dto.criteria.SubscriptionPlanSearchCriteria;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

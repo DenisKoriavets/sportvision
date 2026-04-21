@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.validation;
 
-import com.github.deniskoriavets.sportvision.dto.GroupRequest;
+import com.github.deniskoriavets.sportvision.dto.request.GroupRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

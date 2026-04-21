@@ -1,8 +1,8 @@
 package com.github.deniskoriavets.sportvision.controller;
 
-import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanRequest;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanResponse;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.request.SubscriptionPlanRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SubscriptionPlanResponse;
+import com.github.deniskoriavets.sportvision.dto.criteria.SubscriptionPlanSearchCriteria;
 import com.github.deniskoriavets.sportvision.service.interfaces.SubscriptionPlanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

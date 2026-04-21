@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.mapper;
 
-import com.github.deniskoriavets.sportvision.dto.ChildRequest;
-import com.github.deniskoriavets.sportvision.dto.ChildResponse;
+import com.github.deniskoriavets.sportvision.dto.request.ChildRequest;
+import com.github.deniskoriavets.sportvision.dto.response.ChildResponse;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.repository.specification;
 
-import com.github.deniskoriavets.sportvision.dto.GroupSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.criteria.GroupSearchCriteria;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import com.github.deniskoriavets.sportvision.entity.Group;
 import jakarta.persistence.criteria.Root;

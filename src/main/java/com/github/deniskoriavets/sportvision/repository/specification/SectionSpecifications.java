@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.repository.specification;
 
-import com.github.deniskoriavets.sportvision.dto.SectionSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.criteria.SectionSearchCriteria;
 import com.github.deniskoriavets.sportvision.entity.Section;
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.Predicate;

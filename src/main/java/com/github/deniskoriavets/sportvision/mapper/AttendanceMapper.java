@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.mapper;
 
-import com.github.deniskoriavets.sportvision.dto.AttendanceResponse;
+import com.github.deniskoriavets.sportvision.dto.response.AttendanceResponse;
 import com.github.deniskoriavets.sportvision.entity.Attendance;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

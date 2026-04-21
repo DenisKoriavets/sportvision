@@ -1,13 +1,11 @@
 package com.github.deniskoriavets.sportvision.service;
 
-import com.github.deniskoriavets.sportvision.dto.GroupRequest;
-import com.github.deniskoriavets.sportvision.dto.GroupResponse;
+import com.github.deniskoriavets.sportvision.dto.request.GroupRequest;
+import com.github.deniskoriavets.sportvision.dto.response.GroupResponse;
 import com.github.deniskoriavets.sportvision.entity.Group;
 import com.github.deniskoriavets.sportvision.entity.Section;
 import com.github.deniskoriavets.sportvision.mapper.GroupMapper;
-import com.github.deniskoriavets.sportvision.repository.ChildRepository;
 import com.github.deniskoriavets.sportvision.repository.GroupRepository;
-import com.github.deniskoriavets.sportvision.repository.ParentRepository;
 import com.github.deniskoriavets.sportvision.repository.SectionRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

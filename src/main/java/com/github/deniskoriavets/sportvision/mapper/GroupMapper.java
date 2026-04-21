@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.mapper;
 
-import com.github.deniskoriavets.sportvision.dto.GroupRequest;
-import com.github.deniskoriavets.sportvision.dto.GroupResponse;
+import com.github.deniskoriavets.sportvision.dto.request.GroupRequest;
+import com.github.deniskoriavets.sportvision.dto.response.GroupResponse;
 import com.github.deniskoriavets.sportvision.entity.Group;
 import com.github.deniskoriavets.sportvision.entity.Parent;
 import org.mapstruct.Mapper;

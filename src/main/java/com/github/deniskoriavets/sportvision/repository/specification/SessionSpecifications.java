@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.repository.specification;
 
-import com.github.deniskoriavets.sportvision.dto.SessionSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.criteria.SessionSearchCriteria;
 import com.github.deniskoriavets.sportvision.entity.Session;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;

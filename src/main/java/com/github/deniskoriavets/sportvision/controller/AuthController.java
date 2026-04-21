@@ -1,10 +1,10 @@
 package com.github.deniskoriavets.sportvision.controller;
 
-import com.github.deniskoriavets.sportvision.dto.AuthResponse;
-import com.github.deniskoriavets.sportvision.dto.LoginRequest;
-import com.github.deniskoriavets.sportvision.dto.RefreshTokenRequest;
-import com.github.deniskoriavets.sportvision.dto.RegisterRequest;
-import com.github.deniskoriavets.sportvision.dto.ResendVerificationRequest;
+import com.github.deniskoriavets.sportvision.dto.response.AuthResponse;
+import com.github.deniskoriavets.sportvision.dto.request.LoginRequest;
+import com.github.deniskoriavets.sportvision.dto.request.RefreshTokenRequest;
+import com.github.deniskoriavets.sportvision.dto.request.RegisterRequest;
+import com.github.deniskoriavets.sportvision.dto.request.ResendVerificationRequest;
 import com.github.deniskoriavets.sportvision.service.interfaces.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

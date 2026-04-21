@@ -3,7 +3,7 @@ package com.github.deniskoriavets.sportvision.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.github.deniskoriavets.sportvision.dto.EnrollmentRequest;
+import com.github.deniskoriavets.sportvision.dto.request.EnrollmentRequest;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import com.github.deniskoriavets.sportvision.entity.Group;
 import com.github.deniskoriavets.sportvision.entity.Parent;

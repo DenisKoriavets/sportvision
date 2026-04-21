@@ -1,7 +1,6 @@
 package com.github.deniskoriavets.sportvision.mapper;
 
-import com.github.deniskoriavets.sportvision.dto.SubscriptionRequest;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionResponse;
+import com.github.deniskoriavets.sportvision.dto.response.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.entity.Subscription;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

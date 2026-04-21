@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.repository.specification;
 
-import com.github.deniskoriavets.sportvision.dto.ChildSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.criteria.ChildSearchCriteria;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;

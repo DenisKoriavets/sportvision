@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.service;
 
-import com.github.deniskoriavets.sportvision.dto.BulkAttendanceRequest;
+import com.github.deniskoriavets.sportvision.dto.request.BulkAttendanceRequest;
 import com.github.deniskoriavets.sportvision.entity.Attendance;
 import com.github.deniskoriavets.sportvision.event.AttendanceMarkedEvent;
 import com.github.deniskoriavets.sportvision.repository.AttendanceRepository;

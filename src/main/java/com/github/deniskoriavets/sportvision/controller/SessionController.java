@@ -1,6 +1,11 @@
 package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.dto.*;
+import com.github.deniskoriavets.sportvision.dto.criteria.SessionSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.request.BulkAttendanceRequest;
+import com.github.deniskoriavets.sportvision.dto.request.SessionGenerationRequest;
+import com.github.deniskoriavets.sportvision.dto.request.SessionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SessionResponse;
 import com.github.deniskoriavets.sportvision.service.interfaces.AttendanceService;
 import com.github.deniskoriavets.sportvision.service.interfaces.SessionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +35,8 @@ public class SessionController {
     @PostMapping("/generate")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Згенерувати заняття на основі розкладу на період")
-    public ResponseEntity<Void> generateSessions(@Valid @RequestBody SessionGenerationRequest request) {
+    public ResponseEntity<Void> generateSessions(@Valid @RequestBody
+                                                 SessionGenerationRequest request) {
         sessionService.generateSessions(request);
         return ResponseEntity.ok().build();
     }
@@ -38,7 +44,8 @@ public class SessionController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     @Operation(summary = "Створити разове заняття вручну")
-    public ResponseEntity<SessionResponse> createManualSession(@Valid @RequestBody SessionRequest request) {
+    public ResponseEntity<SessionResponse> createManualSession(@Valid @RequestBody
+                                                               SessionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(sessionService.createManualSession(request));
     }
 

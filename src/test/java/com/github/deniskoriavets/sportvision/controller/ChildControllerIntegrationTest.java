@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.BaseIntegrationTest;
-import com.github.deniskoriavets.sportvision.dto.ChildRequest;
+import com.github.deniskoriavets.sportvision.dto.request.ChildRequest;
 import com.github.deniskoriavets.sportvision.entity.Parent;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
 import com.github.deniskoriavets.sportvision.repository.ParentRepository;

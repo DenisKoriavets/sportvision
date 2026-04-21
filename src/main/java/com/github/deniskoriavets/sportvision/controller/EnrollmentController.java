@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.controller;
 
-import com.github.deniskoriavets.sportvision.dto.EnrollmentRequest;
+import com.github.deniskoriavets.sportvision.dto.request.EnrollmentRequest;
 import com.github.deniskoriavets.sportvision.service.interfaces.EnrollmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +22,7 @@ public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
 
-    @PostMapping("/enroll")
+    @PostMapping
     @Operation(
         summary = "Записати дитину в групу",
         description = "Перевіряє вік дитини, місткість групи та наявність активного абонемента на відповідну секцію."
@@ -33,7 +33,7 @@ public class EnrollmentController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/unenroll")
+    @DeleteMapping
     @Operation(
         summary = "Відрахувати дитину з групи",
         description = "Видаляє зв'язок між дитиною та групою (soft delete). Абонемент залишається активним."

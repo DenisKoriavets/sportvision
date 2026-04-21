@@ -1,9 +1,9 @@
 package com.github.deniskoriavets.sportvision.service;
 
 
-import com.github.deniskoriavets.sportvision.dto.GroupRequest;
-import com.github.deniskoriavets.sportvision.dto.GroupResponse;
-import com.github.deniskoriavets.sportvision.dto.GroupSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.request.GroupRequest;
+import com.github.deniskoriavets.sportvision.dto.response.GroupResponse;
+import com.github.deniskoriavets.sportvision.dto.criteria.GroupSearchCriteria;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.GroupMapper;
 import com.github.deniskoriavets.sportvision.repository.ChildRepository;

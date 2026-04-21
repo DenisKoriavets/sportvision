@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.service.interfaces;
 
-import com.github.deniskoriavets.sportvision.dto.ParentResponse;
-import com.github.deniskoriavets.sportvision.dto.ParentUpdateRequest;
+import com.github.deniskoriavets.sportvision.dto.response.ParentResponse;
+import com.github.deniskoriavets.sportvision.dto.request.ParentUpdateRequest;
 
 public interface ParentService {
     ParentResponse getCurrentParent();

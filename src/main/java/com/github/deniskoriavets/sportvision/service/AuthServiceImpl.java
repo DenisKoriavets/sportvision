@@ -1,9 +1,9 @@
 package com.github.deniskoriavets.sportvision.service;
 
 import com.github.deniskoriavets.sportvision.config.JwtProperties;
-import com.github.deniskoriavets.sportvision.dto.AuthResponse;
-import com.github.deniskoriavets.sportvision.dto.LoginRequest;
-import com.github.deniskoriavets.sportvision.dto.RegisterRequest;
+import com.github.deniskoriavets.sportvision.dto.response.AuthResponse;
+import com.github.deniskoriavets.sportvision.dto.request.LoginRequest;
+import com.github.deniskoriavets.sportvision.dto.request.RegisterRequest;
 import com.github.deniskoriavets.sportvision.entity.Parent;
 import com.github.deniskoriavets.sportvision.entity.RefreshToken;
 import com.github.deniskoriavets.sportvision.entity.VerificationToken;

@@ -1,10 +1,10 @@
 package com.github.deniskoriavets.sportvision.service.interfaces;
 
-import com.github.deniskoriavets.sportvision.dto.AttendanceResponse;
-import com.github.deniskoriavets.sportvision.dto.ChildRequest;
-import com.github.deniskoriavets.sportvision.dto.ChildResponse;
-import com.github.deniskoriavets.sportvision.dto.ChildSearchCriteria;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionResponse;
+import com.github.deniskoriavets.sportvision.dto.response.AttendanceResponse;
+import com.github.deniskoriavets.sportvision.dto.request.ChildRequest;
+import com.github.deniskoriavets.sportvision.dto.response.ChildResponse;
+import com.github.deniskoriavets.sportvision.dto.criteria.ChildSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.response.SubscriptionResponse;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -25,5 +25,5 @@ public interface ChildService {
 
     List<AttendanceResponse> getChildAttendance(UUID childId);
 
-    public List<SubscriptionResponse> getChildSubscriptions(UUID childId);
+    List<SubscriptionResponse> getChildSubscriptions(UUID childId);
 }

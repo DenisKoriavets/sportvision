@@ -1,6 +1,6 @@
 package com.github.deniskoriavets.sportvision.exception;
 
-import com.github.deniskoriavets.sportvision.dto.ErrorResponse;
+import com.github.deniskoriavets.sportvision.dto.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

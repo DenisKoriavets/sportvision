@@ -2,7 +2,7 @@ package com.github.deniskoriavets.sportvision.service;
 
 import static org.mockito.Mockito.*;
 
-import com.github.deniskoriavets.sportvision.dto.BulkAttendanceRequest;
+import com.github.deniskoriavets.sportvision.dto.request.BulkAttendanceRequest;
 import com.github.deniskoriavets.sportvision.dto.ChildAttendanceDto;
 import com.github.deniskoriavets.sportvision.entity.Parent;
 import com.github.deniskoriavets.sportvision.entity.Session;

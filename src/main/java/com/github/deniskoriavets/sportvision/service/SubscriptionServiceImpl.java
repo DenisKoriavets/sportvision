@@ -1,13 +1,12 @@
 package com.github.deniskoriavets.sportvision.service;
 
-import com.github.deniskoriavets.sportvision.dto.SubscriptionRequest;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionResponse;
+import com.github.deniskoriavets.sportvision.dto.request.SubscriptionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import com.github.deniskoriavets.sportvision.entity.Subscription;
 import com.github.deniskoriavets.sportvision.entity.enums.SubscriptionStatus;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.SubscriptionMapper;
-import com.github.deniskoriavets.sportvision.mapper.SubscriptionPlanMapper;
 import com.github.deniskoriavets.sportvision.repository.ChildRepository;
 import com.github.deniskoriavets.sportvision.repository.SubscriptionPlanRepository;
 import com.github.deniskoriavets.sportvision.repository.SubscriptionRepository;

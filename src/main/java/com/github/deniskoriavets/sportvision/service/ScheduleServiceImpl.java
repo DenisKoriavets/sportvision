@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.service;
 
-import com.github.deniskoriavets.sportvision.dto.ScheduleRequest;
-import com.github.deniskoriavets.sportvision.dto.ScheduleResponse;
+import com.github.deniskoriavets.sportvision.dto.request.ScheduleRequest;
+import com.github.deniskoriavets.sportvision.dto.response.ScheduleResponse;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.ScheduleMapper;
 import com.github.deniskoriavets.sportvision.repository.GroupRepository;

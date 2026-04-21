@@ -1,9 +1,7 @@
 package com.github.deniskoriavets.sportvision.service;
 
-import com.github.deniskoriavets.sportvision.dto.ChildRequest;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import com.github.deniskoriavets.sportvision.entity.Parent;
-import com.github.deniskoriavets.sportvision.mapper.ChildMapper;
 import com.github.deniskoriavets.sportvision.repository.ChildRepository;
 import com.github.deniskoriavets.sportvision.security.SecurityFacade;
 import org.junit.jupiter.api.DisplayName;

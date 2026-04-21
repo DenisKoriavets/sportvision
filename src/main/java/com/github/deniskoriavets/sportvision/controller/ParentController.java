@@ -1,7 +1,7 @@
 package com.github.deniskoriavets.sportvision.controller;
 
-import com.github.deniskoriavets.sportvision.dto.ParentResponse;
-import com.github.deniskoriavets.sportvision.dto.ParentUpdateRequest;
+import com.github.deniskoriavets.sportvision.dto.response.ParentResponse;
+import com.github.deniskoriavets.sportvision.dto.request.ParentUpdateRequest;
 import com.github.deniskoriavets.sportvision.service.interfaces.ParentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

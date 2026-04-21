@@ -1,15 +1,14 @@
 package com.github.deniskoriavets.sportvision.service;
 
-import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanRequest;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanResponse;
-import com.github.deniskoriavets.sportvision.dto.SubscriptionPlanSearchCriteria;
+import com.github.deniskoriavets.sportvision.dto.request.SubscriptionPlanRequest;
+import com.github.deniskoriavets.sportvision.dto.response.SubscriptionPlanResponse;
+import com.github.deniskoriavets.sportvision.dto.criteria.SubscriptionPlanSearchCriteria;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.SubscriptionPlanMapper;
 import com.github.deniskoriavets.sportvision.repository.SectionRepository;
 import com.github.deniskoriavets.sportvision.repository.SubscriptionPlanRepository;
 import com.github.deniskoriavets.sportvision.repository.specification.SubscriptionPlanSpecifications;
 import com.github.deniskoriavets.sportvision.service.interfaces.SubscriptionPlanService;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
