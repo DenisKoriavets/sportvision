@@ -35,6 +35,13 @@ public class SessionServiceImpl implements SessionService {
     @Override
     @Transactional
     public void generateSessions(SessionGenerationRequest request) {
+        if (request.startDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Start date cannot be in the past");
+        }
+        if (request.endDate().isBefore(request.startDate())) {
+            throw new IllegalArgumentException("End date must be after start date");
+        }
+
         var schedules = scheduleRepository.findAllByGroupId(request.groupId());
         if (schedules.isEmpty()) {
             return;

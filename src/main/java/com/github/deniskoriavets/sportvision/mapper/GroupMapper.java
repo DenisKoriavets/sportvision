@@ -10,9 +10,14 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface GroupMapper {
 
-    @Mapping(source = "section.id", target = "sectionId")
-    @Mapping(source = "section.name", target = "sectionName")
-    @Mapping(target = "coachName", source = "coach")
+    @Mapping(target = "id", source = "group.id")
+    @Mapping(target = "name", source = "group.name")
+    @Mapping(target = "maxCapacity", source = "group.maxCapacity")
+    @Mapping(target = "ageMin", source = "group.ageMin")
+    @Mapping(target = "ageMax", source = "group.ageMax")
+    @Mapping(target = "sectionId", source = "group.section.id")
+    @Mapping(target = "sectionName", source = "group.section.name")
+    @Mapping(target = "coachName", source = "group.coach")
     @Mapping(target = "currentOccupancy", source = "currentOccupancy")
     GroupResponse toResponse(Group group, Integer currentOccupancy);
 
