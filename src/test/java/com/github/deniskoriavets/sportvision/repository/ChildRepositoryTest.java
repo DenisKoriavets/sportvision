@@ -62,7 +62,7 @@ class ChildRepositoryTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should not return deleted child due to soft delete")
+    @DisplayName("Should not return soft-deleted child")
     void shouldNotReturnDeletedChild() {
         Child child = childRepository.save(Child.builder()
             .firstName("Alice")

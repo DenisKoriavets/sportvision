@@ -1,11 +1,11 @@
 package com.github.deniskoriavets.sportvision.controller;
 
-import com.github.deniskoriavets.sportvision.dto.AuthResponse;
-import com.github.deniskoriavets.sportvision.dto.LoginRequest;
-import com.github.deniskoriavets.sportvision.dto.RefreshTokenRequest;
-import com.github.deniskoriavets.sportvision.dto.RegisterRequest;
-import com.github.deniskoriavets.sportvision.dto.ResendVerificationRequest;
-import com.github.deniskoriavets.sportvision.service.AuthService;
+import com.github.deniskoriavets.sportvision.dto.response.AuthResponse;
+import com.github.deniskoriavets.sportvision.dto.request.LoginRequest;
+import com.github.deniskoriavets.sportvision.dto.request.RefreshTokenRequest;
+import com.github.deniskoriavets.sportvision.dto.request.RegisterRequest;
+import com.github.deniskoriavets.sportvision.dto.request.ResendVerificationRequest;
+import com.github.deniskoriavets.sportvision.service.interfaces.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication", description = "Ендпоінти для реєстрації, логіну та керування сесіями")
+@Tag(name = "Authentication", description = "Registration, login and session management")
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/register")
-    @Operation(summary = "Реєстрація нового користувача (батька)")
+    @Operation(summary = "Register a new parent account")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
@@ -37,26 +37,26 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Автентифікація користувача та отримання токенів")
+    @Operation(summary = "Authenticate and receive JWT tokens")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
     @GetMapping("/verify")
-    @Operation(summary = "Підтвердження пошти за допомогою токена")
+    @Operation(summary = "Verify email address using a token")
     public ResponseEntity<Void> verify(@RequestParam String token) {
         authService.verifyEmail(token);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "Оновлення Access Token за допомогою Refresh Token")
+    @Operation(summary = "Refresh access token using refresh token")
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
         return ResponseEntity.ok(authService.refresh(request.refreshToken()));
     }
 
     @PostMapping("/resend-verification")
-    @Operation(summary = "Повторна відправка листа для верифікації")
+    @Operation(summary = "Resend email verification link")
     public ResponseEntity<Void> resendVerification(@Valid @RequestBody
                                                    ResendVerificationRequest request) {
         authService.resendVerification(request.email());
@@ -64,7 +64,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "Вихід із системи (анулювання Refresh токена)")
+    @Operation(summary = "Logout and invalidate refresh token")
     public ResponseEntity<Void> logout(@Valid @RequestBody RefreshTokenRequest request) {
         authService.logout(request.refreshToken());
         return ResponseEntity.noContent().build();

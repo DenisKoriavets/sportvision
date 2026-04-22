@@ -34,7 +34,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -110,6 +109,7 @@ public class Parent implements UserDetails {
     )
     @Column(name = "notification_preferences")
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private Set<NotificationPreference> notificationPreferences = new HashSet<>();
 
     @Override

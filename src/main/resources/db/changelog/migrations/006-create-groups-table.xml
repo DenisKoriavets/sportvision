@@ -17,8 +17,7 @@
                              referencedColumnNames="id"/>
             </column>
             <column name="coach_id" type="UUID">
-                <constraints nullable="false"
-                             foreignKeyName="fk_groups_coach"
+                <constraints foreignKeyName="fk_groups_coach"
                              referencedTableName="parents"
                              referencedColumnNames="id"/>
             </column>

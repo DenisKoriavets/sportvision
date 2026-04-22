@@ -1,11 +1,13 @@
 package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.BaseIntegrationTest;
-import com.github.deniskoriavets.sportvision.dto.*;
+import com.github.deniskoriavets.sportvision.dto.request.LoginRequest;
+import com.github.deniskoriavets.sportvision.dto.request.RefreshTokenRequest;
+import com.github.deniskoriavets.sportvision.dto.request.RegisterRequest;
 import com.github.deniskoriavets.sportvision.entity.*;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
 import com.github.deniskoriavets.sportvision.repository.*;
-import com.github.deniskoriavets.sportvision.service.EmailService;
+import com.github.deniskoriavets.sportvision.service.interfaces.EmailService;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -50,9 +52,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        tokenRepository.deleteAll();
-        refreshTokenRepository.deleteAll();
-        parentRepository.deleteAll();
+        truncateAll();
     }
 
     @Test

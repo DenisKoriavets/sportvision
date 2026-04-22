@@ -119,7 +119,7 @@ class SubscriptionRepositoryTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should respect soft delete for subscriptions")
+    @DisplayName("Should respect soft deleteSubscriptionPlan for subscriptions")
     void shouldRespectSoftDelete() {
         Subscription sub = subscriptionRepository.save(Subscription.builder()
                 .child(testChild)
