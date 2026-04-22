@@ -5,15 +5,15 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record RegisterRequest(
-    @NotBlank(message = "Значення email не може бути порожнім")
-    @Email(message = "Некоректний формат email")
+    @NotBlank(message = "Email must not be blank")
+    @Email(message = "Invalid email format")
     String email,
-    @NotBlank(message = "Значення пароля не може бути порожнім")
+    @NotBlank(message = "Password must not be blank")
     @Password
     String password,
-    @NotBlank(message = "Ім'я не може бути порожнім")
+    @NotBlank(message = "First name must not be blank")
     String firstName,
-    @NotBlank(message = "Прізвище не може бути порожнім")
+    @NotBlank(message = "Last name must not be blank")
     String lastName
 ) {
 }

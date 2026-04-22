@@ -7,8 +7,8 @@ import jakarta.validation.constraints.NotEmpty;
 import java.util.Set;
 
 public record ParentUpdateRequest(
-    @NotBlank String firstName,
-    @NotBlank String lastName,
+    @NotBlank(message = "First name must not be blank") String firstName,
+    @NotBlank(message = "Last name must not be blank") String lastName,
     @ValidPhoneNumber String phone,
     @NotEmpty Set<NotificationPreference> notificationPreferences
 ) {

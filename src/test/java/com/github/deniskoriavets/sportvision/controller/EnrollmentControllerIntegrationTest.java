@@ -39,7 +39,7 @@ class EnrollmentControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Успішний запис дитини в групу — 200")
+    @DisplayName("Enroll child in group successfully — returns 200")
     void enrollChild_Success() throws Exception {
         Parent parent = createParent("enroll-ok@test.com", Role.PARENT);
         Parent coach = createParent("coach-ok@test.com", Role.COACH);
@@ -74,7 +74,7 @@ class EnrollmentControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Помилка запису при невідповідності віку — 409")
+    @DisplayName("Enrollment fails due to age mismatch — returns 409")
     void enrollChild_Fails_AgeMismatch() throws Exception {
         Parent parent = createParent("enroll@test.com", Role.PARENT);
         Parent coach = createParent("coach@test.com", Role.COACH);
@@ -98,7 +98,7 @@ class EnrollmentControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("PARENT не може записати чужу дитину — 403")
+    @DisplayName("PARENT cannot enroll another user's child — returns 403")
     void enrollChild_Fails_WhenNotOwner() throws Exception {
         Parent parent = createParent("owner@test.com", Role.PARENT);
         Parent otherParent = createParent("other@test.com", Role.PARENT);

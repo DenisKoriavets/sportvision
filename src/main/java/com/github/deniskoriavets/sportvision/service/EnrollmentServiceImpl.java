@@ -69,7 +69,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
             .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
 
         if (!child.getParent().getId().equals(securityFacade.getCurrentUserId())) {
-            throw new AccessDeniedException("Ви не маєте доступу до даних цієї дитини");
+            throw new AccessDeniedException("Access to this child's data is denied");
         }
         return child;
     }

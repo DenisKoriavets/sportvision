@@ -52,9 +52,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        tokenRepository.deleteAll();
-        refreshTokenRepository.deleteAll();
-        parentRepository.deleteAll();
+        truncateAll();
     }
 
     @Test

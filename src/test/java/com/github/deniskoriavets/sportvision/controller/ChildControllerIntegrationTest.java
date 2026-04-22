@@ -40,7 +40,7 @@ class ChildControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Успішне створення дитини — 201")
+    @DisplayName("Create child successfully — returns 201")
     void createChild_Success() throws Exception {
         ChildRequest request = new ChildRequest("Олексій", "Іванов", LocalDate.now().minusYears(10));
 
@@ -54,7 +54,7 @@ class ChildControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Валідація — порожнє ім'я повертає 400")
+    @DisplayName("Validation — blank first name returns 400")
     void createChild_Fails_WhenFirstNameBlank() throws Exception {
         ChildRequest request = new ChildRequest("", "Іванов", LocalDate.now().minusYears(10));
 
@@ -66,7 +66,7 @@ class ChildControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Отримання списку дітей поточного батька")
+    @DisplayName("Get all children returns only current user's children")
     void getAllChildren_ReturnsOwnChildren() throws Exception {
         childRepository.save(Child.builder()
             .firstName("Марія").lastName("Іванова")
@@ -80,7 +80,7 @@ class ChildControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Отримання дитини за ID")
+    @DisplayName("Get child by ID — returns 200")
     void getChildById_Success() throws Exception {
         Child child = childRepository.save(Child.builder()
             .firstName("Петро").lastName("Коваль")
@@ -93,7 +93,7 @@ class ChildControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Отримання чужої дитини повертає 403")
+    @DisplayName("Get another user's child — returns 403")
     void getChildById_Forbidden_WhenNotOwner() throws Exception {
         Parent otherParent = createParent("other@test.com", Role.PARENT);
         Child otherChild = childRepository.save(Child.builder()
@@ -106,7 +106,7 @@ class ChildControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Оновлення дитини — 200")
+    @DisplayName("Update child — returns 200")
     void updateChild_Success() throws Exception {
         Child child = childRepository.save(Child.builder()
             .firstName("Старе").lastName("Ім'я")
@@ -122,7 +122,7 @@ class ChildControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Видалення дитини — 204")
+    @DisplayName("Delete child — returns 204")
     void deleteChild_Success() throws Exception {
         Child child = childRepository.save(Child.builder()
             .firstName("Delete").lastName("Me")
@@ -134,7 +134,7 @@ class ChildControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Запит без токена повертає 403")
+    @DisplayName("Request without token — returns 403")
     void anyRequest_Without_Token_Returns403() throws Exception {
         mockMvc.perform(get("/api/v1/children"))
             .andExpect(status().isForbidden());

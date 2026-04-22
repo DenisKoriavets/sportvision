@@ -4,9 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record LoginRequest(
-    @NotBlank(message = "Значення email не може бути порожнім")
-    @Email(message = "Некоректний формат email")
+    @NotBlank(message = "Email must not be blank")
+    @Email(message = "Invalid email format")
     String email,
-    @NotBlank(message = "Значення пароля не може бути порожнім")
+    @NotBlank(message = "Password must not be blank")
     String password
 ) {}

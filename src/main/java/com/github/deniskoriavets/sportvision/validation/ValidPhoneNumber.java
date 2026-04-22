@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidPhoneNumber {
     
-    String message() default "Некоректний формат номера телефону. Очікується +380XXXXXXXXX";
+    String message() default "Invalid phone number format. Expected: +380XXXXXXXXX";
 
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

@@ -32,7 +32,7 @@ class SubscriptionPlanServiceImplTest {
     @InjectMocks private SubscriptionPlanServiceImpl subscriptionPlanService;
 
     @Test
-    @DisplayName("Успішне створення тарифного плану")
+    @DisplayName("Creates subscription plan successfully")
     void createSubscriptionPlan_Success() {
         UUID sectionId = UUID.randomUUID();
         SubscriptionPlanRequest request = new SubscriptionPlanRequest(

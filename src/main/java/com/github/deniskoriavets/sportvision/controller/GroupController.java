@@ -21,13 +21,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/groups")
 @RequiredArgsConstructor
-@Tag(name = "Groups", description = "Управління спортивними групами")
+@Tag(name = "Groups", description = "Managing sport groups within sections")
 public class GroupController {
 
     private final GroupService groupService;
 
     @GetMapping
-    @Operation(summary = "Отримати список груп з фільтрацією та пагінацією")
+    @Operation(summary = "Get groups with filtering and pagination")
     public ResponseEntity<Page<GroupResponse>> getGroups(
             @ParameterObject GroupSearchCriteria criteria,
             @ParameterObject Pageable pageable
@@ -37,20 +37,20 @@ public class GroupController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Створити нову групу (Тільки для ADMIN)")
+    @Operation(summary = "Create a new group")
     public ResponseEntity<GroupResponse> createGroup(@Valid @RequestBody GroupRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(groupService.createGroup(request));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Отримати групу за ID")
+    @Operation(summary = "Get group by ID")
     public ResponseEntity<GroupResponse> getGroupById(@PathVariable UUID id) {
         return ResponseEntity.ok(groupService.getGroupById(id));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Оновити дані групи (Тільки для ADMIN)")
+    @Operation(summary = "Update group data")
     public ResponseEntity<GroupResponse> updateGroup(
             @PathVariable UUID id,
             @Valid @RequestBody GroupRequest request
@@ -60,7 +60,7 @@ public class GroupController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Видалити групу (Тільки для ADMIN)")
+    @Operation(summary = "Delete group")
     public ResponseEntity<Void> deleteGroup(@PathVariable UUID id) {
         groupService.deleteGroup(id);
         return ResponseEntity.noContent().build();

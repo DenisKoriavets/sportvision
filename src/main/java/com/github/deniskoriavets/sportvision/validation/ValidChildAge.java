@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidChildAge {
 
-    String message() default "Дитина повинна бути віком від 4 до 16 років";
+    String message() default "Child must be between 4 and 16 years old";
 
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

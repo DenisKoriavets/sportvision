@@ -44,7 +44,7 @@ class SubscriptionServiceImplTest {
     private SubscriptionServiceImpl subscriptionService;
 
     @Test
-    @DisplayName("Успішна купівля абонемента при валідних даних")
+    @DisplayName("Purchases subscription successfully with valid data")
     void buySubscription_Success() {
         UUID childId = UUID.randomUUID();
         UUID parentId = UUID.randomUUID();
@@ -81,7 +81,7 @@ class SubscriptionServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка при спробі купити неактивний тарифний план")
+    @DisplayName("Throws exception when subscription plan is inactive")
     void buySubscription_ThrowsException_WhenPlanInactive() {
         UUID childId = UUID.randomUUID();
         UUID parentId = UUID.randomUUID();
@@ -104,7 +104,7 @@ class SubscriptionServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка при спробі купити абонемент на секцію, де вже є активний абонемент")
+    @DisplayName("Throws exception when child already has an active subscription for this section")
     void buySubscription_ThrowsException_WhenAlreadyHasActive() {
         UUID childId = UUID.randomUUID();
         UUID parentId = UUID.randomUUID();

@@ -21,13 +21,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/sections")
 @RequiredArgsConstructor
-@Tag(name = "Sections", description = "Управління спортивними секціями клубу")
+@Tag(name = "Sections", description = "Managing sport sections")
 public class SectionController {
 
     private final SectionService sectionService;
 
     @GetMapping
-    @Operation(summary = "Отримати список секцій з фільтрацією та пагінацією")
+    @Operation(summary = "Get sections with filtering and pagination")
     public ResponseEntity<Page<SectionResponse>> getSections(
             @ParameterObject SectionSearchCriteria criteria,
             @ParameterObject Pageable pageable
@@ -37,20 +37,20 @@ public class SectionController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Створити нову секцію (Тільки для ADMIN)")
+    @Operation(summary = "Create a new section")
     public ResponseEntity<SectionResponse> createSection(@Valid @RequestBody SectionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(sectionService.createSection(request));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Отримати секцію за ID")
+    @Operation(summary = "Get section by ID")
     public ResponseEntity<SectionResponse> getSectionById(@PathVariable UUID id) {
         return ResponseEntity.ok(sectionService.getSectionById(id));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Оновити дані секції (Тільки для ADMIN)")
+    @Operation(summary = "Update section data")
     public ResponseEntity<SectionResponse> updateSection(
             @PathVariable UUID id,
             @Valid @RequestBody SectionRequest request
@@ -60,7 +60,7 @@ public class SectionController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Видалити секцію (Тільки для ADMIN)")
+    @Operation(summary = "Delete section")
     public ResponseEntity<Void> deleteSection(@PathVariable UUID id) {
         sectionService.deleteSection(id);
         return ResponseEntity.noContent().build();

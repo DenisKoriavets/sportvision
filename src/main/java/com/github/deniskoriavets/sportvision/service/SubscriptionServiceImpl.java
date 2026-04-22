@@ -78,7 +78,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         if (!subscription.getChild().getParent().getId()
             .equals(securityFacade.getCurrentUserId())) {
-            throw new AccessDeniedException("Ви не маєте доступу до даних цієї підписки");
+            throw new AccessDeniedException("Access to this subscription is denied");
         }
 
         if (subscription.getStatus() == SubscriptionStatus.ACTIVE ||
@@ -97,7 +97,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         if (!subscription.getChild().getParent().getId()
             .equals(securityFacade.getCurrentUserId())) {
-            throw new AccessDeniedException("Ви не маєте доступу до даних цієї підписки");
+            throw new AccessDeniedException("Access to this subscription is denied");
         }
 
         return subscriptionMapper.toResponse(subscription);
@@ -108,7 +108,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
 
         if (!child.getParent().getId().equals(securityFacade.getCurrentUserId())) {
-            throw new AccessDeniedException("Ви не маєте доступу до даних цієї дитини");
+            throw new AccessDeniedException("Access to this child's data is denied");
         }
         return child;
     }

@@ -17,27 +17,27 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/schedules")
 @RequiredArgsConstructor
-@Tag(name = "Schedules", description = "Управління шаблонами розкладу груп")
+@Tag(name = "Schedules", description = "Managing recurring schedule templates for groups")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Створити новий слот у розкладі")
+    @Operation(summary = "Create a new schedule slot")
     public ResponseEntity<ScheduleResponse> createSchedule(@Valid @RequestBody ScheduleRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.createSchedule(request));
     }
 
     @GetMapping("/group/{groupId}")
-    @Operation(summary = "Отримати весь розклад конкретної групи")
+    @Operation(summary = "Get full schedule for a group")
     public ResponseEntity<List<ScheduleResponse>> getGroupSchedules(@PathVariable UUID groupId) {
         return ResponseEntity.ok(scheduleService.getGroupSchedules(groupId));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Видалити слот із розкладу")
+    @Operation(summary = "Delete a schedule slot")
     public ResponseEntity<Void> deleteSchedule(@PathVariable UUID id) {
         scheduleService.deleteSchedule(id);
         return ResponseEntity.noContent().build();

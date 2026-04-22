@@ -37,7 +37,7 @@ class AttendanceServiceImplTest {
     @InjectMocks private AttendanceServiceImpl attendanceService;
 
     @Test
-    @DisplayName("Успішне збереження відмітки і публікація події при статусі PRESENT")
+    @DisplayName("Saves attendance and publishes event when status is PRESENT")
     void markBulkAttendance_SavesAttendanceAndPublishesEvent() {
         UUID sessionId = UUID.randomUUID();
         UUID childId = UUID.randomUUID();
@@ -61,7 +61,7 @@ class AttendanceServiceImplTest {
     }
 
     @Test
-    @DisplayName("Подія не публікується при статусі ABSENT")
+    @DisplayName("Saves attendance and publishes event when status is ABSENT")
     void markBulkAttendance_DoesNotPublishEvent_WhenAbsent() {
         UUID sessionId = UUID.randomUUID();
         UUID childId = UUID.randomUUID();
@@ -85,7 +85,7 @@ class AttendanceServiceImplTest {
     }
 
     @Test
-    @DisplayName("Дублікат відмітки — save і publishEvent не викликаються")
+    @DisplayName("Skips duplicate attendance — save and publishEvent are not called")
     void markBulkAttendance_SkipsDuplicate() {
         UUID sessionId = UUID.randomUUID();
         UUID childId = UUID.randomUUID();

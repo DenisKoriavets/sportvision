@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = AgePeriodValidator.class)
 public @interface ValidAgePeriod {
-    String message() default "Мінімальний вік не може бути більшим за максимальний";
+    String message() default "Minimum age cannot be greater than maximum age";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

@@ -4,11 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record SectionRequest(
-    @NotBlank(message = "Назва секції не може бути порожньою")
-    @Size(max = 255, message = "Назва не може бути довшою за 255 символів")
+    @NotBlank(message = "Section name must not be blank")
+    @Size(max = 255, message = "Name must not exceed 255 characters")
     String name,
 
-    @Size(max = 1000, message = "Опис не може бути довшим за 1000 символів")
+    @Size(max = 1000, message = "Description must not exceed 1000 characters")
     String description
 ) {
 }

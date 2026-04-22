@@ -35,14 +35,14 @@ class SubscriptionControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Успішна покупка абонемента")
+    @DisplayName("Purchase subscription successfully — returns 201")
     void buySubscription_Success() throws Exception {
         Parent parent = parentRepository.save(Parent.builder()
             .email("sub@test.com")
             .passwordHash("h")
-            .firstName("John") // ОБОВ'ЯЗКОВО
-            .lastName("Doe")   // ОБОВ'ЯЗКОВО
-            .role(Role.PARENT) // ОБОВ'ЯЗКОВО
+            .firstName("John")
+            .lastName("Doe")
+            .role(Role.PARENT)
             .isEmailVerified(true)
             .isActive(true)
             .build());

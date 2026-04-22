@@ -21,87 +21,95 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleBusinessLogicConflict(
         IllegalStateException ex, HttpServletRequest request) {
-        return buildResponse(HttpStatus.CONFLICT, "Конфлікт бізнес-правил",
+        return buildResponse(HttpStatus.CONFLICT, "Business rule violation",
             ex.getMessage(), request.getRequestURI(), null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex, HttpServletRequest request) {
-        
+        MethodArgumentNotValidException ex, HttpServletRequest request) {
+
         Map<String, String> errors = new HashMap<>();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
         }
-        
-        return buildResponse(HttpStatus.BAD_REQUEST, "Помилка валідації", 
-                "Перевірте правильність введених даних", request.getRequestURI(), errors);
+
+        return buildResponse(HttpStatus.BAD_REQUEST, "Validation error",
+            "Please check the provided data", request.getRequestURI(), errors);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(
-            ResourceNotFoundException ex, HttpServletRequest request) {
-        return buildResponse(HttpStatus.NOT_FOUND, "Ресурс не знайдено", ex.getMessage(), request.getRequestURI(), null);
+        ResourceNotFoundException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.NOT_FOUND, "Resource not found", ex.getMessage(),
+            request.getRequestURI(), null);
     }
 
     @ExceptionHandler({
-            EmailAlreadyTakenException.class,
-            EmailAlreadyVerifiedException.class,
-            ObjectOptimisticLockingFailureException.class
+        EmailAlreadyTakenException.class,
+        EmailAlreadyVerifiedException.class,
+        ObjectOptimisticLockingFailureException.class
     })
     public ResponseEntity<ErrorResponse> handleConflicts(
-            RuntimeException ex, HttpServletRequest request) {
-        
+        RuntimeException ex, HttpServletRequest request) {
+
         String message = ex.getMessage();
         if (ex instanceof ObjectOptimisticLockingFailureException) {
-            message = "Дані були змінені іншим користувачем або процесом. Будь ласка, оновіть сторінку і спробуйте ще раз.";
+            message =
+                "Data was modified by another user or process. Please refresh and try again.";
         }
-        
-        return buildResponse(HttpStatus.CONFLICT, "Конфлікт даних", message, request.getRequestURI(), null);
+
+        return buildResponse(HttpStatus.CONFLICT, "Data conflict", message,
+            request.getRequestURI(), null);
     }
 
     @ExceptionHandler({
-            InvalidCredentialsException.class,
-            InvalidTokenException.class,
-            TokenExpiredException.class
+        InvalidCredentialsException.class,
+        InvalidTokenException.class,
+        TokenExpiredException.class
     })
     public ResponseEntity<ErrorResponse> handleUnauthorized(
-            RuntimeException ex, HttpServletRequest request) {
-        return buildResponse(HttpStatus.UNAUTHORIZED, "Помилка автентифікації", ex.getMessage(), request.getRequestURI(), null);
+        RuntimeException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Authentication error", ex.getMessage(),
+            request.getRequestURI(), null);
     }
 
     @ExceptionHandler({
-            EmailNotVerifiedException.class,
-            AccessDeniedException.class
+        EmailNotVerifiedException.class,
+        AccessDeniedException.class
     })
     public ResponseEntity<ErrorResponse> handleForbidden(
-            RuntimeException ex, HttpServletRequest request) {
-        return buildResponse(HttpStatus.FORBIDDEN, "Доступ заборонено", ex.getMessage(), request.getRequestURI(), null);
+        RuntimeException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.FORBIDDEN, "Access denied", ex.getMessage(),
+            request.getRequestURI(), null);
     }
 
     @ExceptionHandler(EmailSendingException.class)
     public ResponseEntity<ErrorResponse> handleEmailSending(
-            EmailSendingException ex, HttpServletRequest request) {
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Помилка зовнішнього сервісу", ex.getMessage(), request.getRequestURI(), null);
+        EmailSendingException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "External service error",
+            ex.getMessage(), request.getRequestURI(), null);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllOtherExceptions(
-            Exception ex, HttpServletRequest request) {
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Внутрішня помилка сервера",
-                "Сталася непередбачувана помилка. Ми вже працюємо над її вирішенням.", request.getRequestURI(), null);
+        Exception ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error",
+            "An unexpected error occurred. We are already working on it.",
+            request.getRequestURI(), null);
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(
-            HttpStatus status, String error, String message, String path, Map<String, String> validationErrors) {
-        
+        HttpStatus status, String error, String message, String path,
+        Map<String, String> validationErrors) {
+
         ErrorResponse response = new ErrorResponse(
-                Instant.now(),
-                status.value(),
-                error,
-                message,
-                path,
-                validationErrors
+            Instant.now(),
+            status.value(),
+            error,
+            message,
+            path,
+            validationErrors
         );
         return ResponseEntity.status(status).body(response);
     }

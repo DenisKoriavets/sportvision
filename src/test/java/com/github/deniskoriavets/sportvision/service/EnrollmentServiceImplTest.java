@@ -56,7 +56,7 @@ class EnrollmentServiceImplTest {
     }
 
     @Test
-    @DisplayName("Успішний запис дитини в групу")
+    @DisplayName("Enrolls child in group successfully")
     void enrollChild_Success() {
         UUID parentId = UUID.randomUUID();
         UUID childId = UUID.randomUUID();
@@ -75,7 +75,7 @@ class EnrollmentServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка при занадто малому віці дитини")
+    @DisplayName("Throws exception when child is too young")
     void enrollChild_ThrowsException_WhenTooYoung() {
         UUID parentId = UUID.randomUUID();
         UUID childId = UUID.randomUUID();
@@ -91,7 +91,7 @@ class EnrollmentServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка при занадто великому віці дитини")
+    @DisplayName("Throws exception when child is too old")
     void enrollChild_ThrowsException_WhenTooOld() {
         UUID parentId = UUID.randomUUID();
         UUID childId = UUID.randomUUID();
@@ -107,7 +107,7 @@ class EnrollmentServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка коли група заповнена")
+    @DisplayName("Throws exception when group is at full capacity")
     void enrollChild_ThrowsException_WhenGroupFull() {
         UUID parentId = UUID.randomUUID();
         UUID childId = UUID.randomUUID();
@@ -124,7 +124,7 @@ class EnrollmentServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка коли немає активного абонементу")
+    @DisplayName("Throws exception when child has no active subscription")
     void enrollChild_ThrowsException_WhenNoActiveSubscription() {
         UUID parentId = UUID.randomUUID();
         UUID childId = UUID.randomUUID();
@@ -143,7 +143,7 @@ class EnrollmentServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка доступу коли не власник дитини")
+    @DisplayName("Throws AccessDeniedException when caller is not the child's owner")
     void enrollChild_ThrowsAccessDenied_WhenNotOwner() {
         UUID childId = UUID.randomUUID();
         Child child = buildChild(UUID.randomUUID(), 10);

@@ -5,6 +5,7 @@ import com.github.deniskoriavets.sportvision.entity.Parent;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
 import com.github.deniskoriavets.sportvision.repository.ParentRepository;
 import com.github.deniskoriavets.sportvision.security.JwtService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,13 @@ class ParentControllerIntegrationTest extends BaseIntegrationTest {
     @Autowired private ParentRepository parentRepository;
     @Autowired private JwtService jwtService;
 
+    @BeforeEach
+    void setUp() {
+        truncateAll();
+    }
+
     @Test
-    @DisplayName("Успішне отримання профілю через /me")
+    @DisplayName("Get current user profile via /me — returns 200")
     void getMe_Success() throws Exception {
         Parent parent = parentRepository.save(Parent.builder()
                 .email("denis@koriavets.com").firstName("Денис").lastName("Корявець")

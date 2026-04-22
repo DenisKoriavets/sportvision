@@ -17,19 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/parents")
 @RequiredArgsConstructor
-@Tag(name = "Parents", description = "Управління профілем батьків")
+@Tag(name = "Parents", description = "Managing parent profile")
 public class ParentController {
 
     private final ParentService parentService;
 
     @GetMapping("/me")
-    @Operation(summary = "Отримати профіль поточного користувача")
+    @Operation(summary = "Get current user profile")
     public ResponseEntity<ParentResponse> getCurrentParent() {
         return ResponseEntity.ok(parentService.getCurrentParent());
     }
 
     @PutMapping("/me")
-    @Operation(summary = "Оновити дані профілю")
+    @Operation(summary = "Update current user profile")
     public ResponseEntity<ParentResponse> updateParent(@Valid @RequestBody ParentUpdateRequest request) {
         return ResponseEntity.ok(parentService.updateCurrentParent(request));
     }

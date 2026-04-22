@@ -17,15 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/enrollments")
 @PreAuthorize("hasRole('PARENT')")
 @RequiredArgsConstructor
-@Tag(name = "Enrollments", description = "Управління записом дітей у спортивні групи (Тільки для PARENT)")
+@Tag(name = "Enrollments", description = "Managing child enrollment in sport groups")
 public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
 
     @PostMapping
     @Operation(
-        summary = "Записати дитину в групу",
-        description = "Перевіряє вік дитини, місткість групи та наявність активного абонемента на відповідну секцію."
+        summary = "Enroll a child in a group",
+        description = "Validates child's age, group capacity and active subscription for the section."
     )
     public ResponseEntity<Void> enrollChildInSection(@RequestBody
                                                      EnrollmentRequest enrollmentRequest) {
@@ -35,8 +35,8 @@ public class EnrollmentController {
 
     @DeleteMapping
     @Operation(
-        summary = "Відрахувати дитину з групи",
-        description = "Видаляє зв'язок між дитиною та групою (soft delete). Абонемент залишається активним."
+        summary = "Unenroll a child from a group",
+        description = "Removes the child-group link. The subscription remains active."
     )
     public ResponseEntity<Void> unenrollChildFromSection(@RequestBody
                                                          EnrollmentRequest enrollmentRequest) {

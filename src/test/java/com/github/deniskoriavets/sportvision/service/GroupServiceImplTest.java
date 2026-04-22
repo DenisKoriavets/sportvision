@@ -31,7 +31,7 @@ class GroupServiceImplTest {
     @InjectMocks private GroupServiceImpl groupService;
 
     @Test
-    @DisplayName("Успішне створення групи")
+    @DisplayName("Creates group successfully")
     void createGroup_Success() {
         UUID sectionId = UUID.randomUUID();
         GroupRequest request = new GroupRequest("Група А", sectionId, null, 15, 7, 10);
@@ -39,9 +39,14 @@ class GroupServiceImplTest {
         when(sectionRepository.findById(sectionId)).thenReturn(Optional.of(new Section()));
         when(groupMapper.toEntity(request)).thenReturn(new Group());
         when(groupRepository.save(any())).thenReturn(new Group());
-        when(groupMapper.toResponse(any(), anyInt())).thenReturn(mock(GroupResponse.class));
 
-        assertNotNull(groupService.createGroup(request));
-        verify(groupRepository).save(any());
+        when(groupMapper.toResponseWithOccupancy(any(), anyInt())).thenReturn(
+            new GroupResponse(UUID.randomUUID(), "Група А", sectionId, "Секція", "Тренер", 15, 0, 7, 10)
+        );
+
+        GroupResponse response = groupService.createGroup(request);
+
+        assertNotNull(response);
+        verify(groupMapper).toResponseWithOccupancy(any(), eq(0));
     }
 }

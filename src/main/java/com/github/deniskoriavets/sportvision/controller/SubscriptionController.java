@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,35 +26,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/subscriptions")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('PARENT')")
-@Tag(name = "Subscriptions", description = "Управління абонементами дітей (Тільки для батьків)")
+@Tag(name = "Subscriptions", description = "Managing child subscriptions")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    @Operation(summary = "Купити абонемент для дитини")
-    @ApiResponse(responseCode = "201", description = "Абонемент успішно створено")
+    @Operation(summary = "Purchase a subscription for a child")
     @PostMapping("/buy")
     public ResponseEntity<SubscriptionResponse> buy(
-        @RequestBody SubscriptionRequest subscriptionRequest) {
+        @Valid @RequestBody SubscriptionRequest subscriptionRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(subscriptionService.buySubscription(subscriptionRequest));
     }
 
-    @Operation(summary = "Отримати всі абонементи конкретної дитини")
+    @Operation(summary = "Get all subscriptions for a child")
     @GetMapping("/child/{childId}")
     public ResponseEntity<List<SubscriptionResponse>> getByChildId(
         @PathVariable UUID childId) {
         return ResponseEntity.ok(subscriptionService.getChildSubscriptions(childId));
     }
 
-    @Operation(summary = "Отримати деталі абонемента за ID")
+    @Operation(summary = "Get subscription by ID")
     @GetMapping("/{id}")
     public ResponseEntity<SubscriptionResponse> getById(
         @Parameter(description = "ID абонемента") @PathVariable UUID id) {
         return ResponseEntity.ok(subscriptionService.getSubscriptionById(id));
     }
 
-    @Operation(summary = "Скасувати абонемент")
-    @ApiResponse(responseCode = "204", description = "Абонемент скасовано")
+    @Operation(summary = "Cancel a subscription")
     @PutMapping("/{id}/cancel")
     public ResponseEntity<Void> cancel(@PathVariable UUID id) {
         subscriptionService.cancelSubscription(id);

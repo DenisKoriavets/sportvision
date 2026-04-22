@@ -41,7 +41,7 @@ class SessionServiceImplTest {
     @InjectMocks private SessionServiceImpl sessionService;
 
     @Test
-    @DisplayName("Успішна генерація занять за розкладом")
+    @DisplayName("Generates sessions for matching days from schedule")
     void generateSessions_CreatesSessionsForMatchingDays() {
         UUID groupId = UUID.randomUUID();
         LocalDate start = LocalDate.now().with(TemporalAdjusters.next(java.time.DayOfWeek.MONDAY));
@@ -63,7 +63,7 @@ class SessionServiceImplTest {
     }
 
     @Test
-    @DisplayName("Не дублює вже існуюче заняття")
+    @DisplayName("Skips sessions that already exist")
     void generateSessions_SkipsExistingSessions() {
         UUID groupId = UUID.randomUUID();
         LocalDate start = LocalDate.now().with(TemporalAdjusters.next(java.time.DayOfWeek.MONDAY));
@@ -84,7 +84,7 @@ class SessionServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка коли startDate у минулому")
+    @DisplayName("Throws exception when start date is in the past")
     void generateSessions_ThrowsException_WhenStartInPast() {
         UUID groupId = UUID.randomUUID();
         LocalDate past = LocalDate.now().minusDays(1);
@@ -94,7 +94,7 @@ class SessionServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка коли endDate раніше startDate")
+    @DisplayName("Throws exception when end date is before start date")
     void generateSessions_ThrowsException_WhenEndBeforeStart() {
         UUID groupId = UUID.randomUUID();
         LocalDate start = LocalDate.now().plusDays(5);
@@ -105,7 +105,7 @@ class SessionServiceImplTest {
     }
 
     @Test
-    @DisplayName("Успішне скасування заняття")
+    @DisplayName("Sets session status to CANCELLED")
     void cancelSession_SetsStatusCancelled() {
         UUID sessionId = UUID.randomUUID();
         Session session = new Session();
@@ -122,7 +122,7 @@ class SessionServiceImplTest {
     }
 
     @Test
-    @DisplayName("Успішне створення разового заняття")
+    @DisplayName("Creates one-off session successfully")
     void createManualSession_Success() {
         UUID groupId = UUID.randomUUID();
         SessionRequest request = new SessionRequest(groupId, LocalDate.now().plusDays(1),

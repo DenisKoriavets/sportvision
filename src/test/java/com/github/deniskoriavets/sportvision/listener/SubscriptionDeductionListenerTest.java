@@ -33,7 +33,7 @@ class SubscriptionDeductionListenerTest {
     private SubscriptionDeductionListener listener;
 
     @Test
-    @DisplayName("Списання заняття з активного абонемента при присутності дитини")
+    @DisplayName("Deducts session from active subscription when child is present")
     void onAttendanceMarked_DeductsSession() {
         UUID childId = UUID.randomUUID();
         UUID sessionId = UUID.randomUUID();
@@ -64,7 +64,7 @@ class SubscriptionDeductionListenerTest {
     }
 
     @Test
-    @DisplayName("Зміна статусу абонемента на EXPIRED при нульовому залишку")
+    @DisplayName("Sets subscription status to EXPIRED when remaining sessions reach zero")
     void onAttendanceMarked_SetsExpired_WhenZeroRemaining() {
         UUID childId = UUID.randomUUID();
         UUID sessionId = UUID.randomUUID();

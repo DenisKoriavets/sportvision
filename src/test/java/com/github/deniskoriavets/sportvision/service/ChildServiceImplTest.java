@@ -32,15 +32,11 @@ class ChildServiceImplTest {
     @Mock private ChildRepository childRepository;
     @Mock private ChildMapper childMapper;
     @Mock private SecurityFacade securityFacade;
-    @Mock private AttendanceRepository attendanceRepository;
-    @Mock private SubscriptionRepository subscriptionRepository;
-    @Mock private AttendanceMapper attendanceMapper;
-    @Mock private SubscriptionMapper subscriptionMapper;
 
     @InjectMocks private ChildServiceImpl childService;
 
     @Test
-    @DisplayName("Успішне створення дитини — дитина зберігається з поточним батьком")
+    @DisplayName("Creates child and assigns current parent successfully")
     void createChild_Success() {
         ChildRequest request = new ChildRequest("Олексій", "Іванов", LocalDate.now().minusYears(8));
         Parent parent = new Parent();
@@ -60,7 +56,7 @@ class ChildServiceImplTest {
     }
 
     @Test
-    @DisplayName("Успішне оновлення даних дитини")
+    @DisplayName("Updates child data successfully")
     void updateChild_Success() {
         UUID childId = UUID.randomUUID();
         UUID parentId = UUID.randomUUID();
@@ -82,7 +78,7 @@ class ChildServiceImplTest {
     }
 
     @Test
-    @DisplayName("Успішне видалення дитини")
+    @DisplayName("Deletes child successfully")
     void deleteChild_Success() {
         UUID childId = UUID.randomUUID();
         UUID parentId = UUID.randomUUID();
@@ -100,7 +96,7 @@ class ChildServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка доступу при спробі отримати дані чужої дитини")
+    @DisplayName("Throws AccessDeniedException when accessing another user's child")
     void getChildById_ThrowsAccessDenied_WhenNotOwner() {
         UUID childId = UUID.randomUUID();
         Parent parent = new Parent();
@@ -115,7 +111,7 @@ class ChildServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка доступу при оновленні чужої дитини")
+    @DisplayName("Throws AccessDeniedException when updating another user's child")
     void updateChild_ThrowsAccessDenied_WhenNotOwner() {
         UUID childId = UUID.randomUUID();
         Parent parent = new Parent();

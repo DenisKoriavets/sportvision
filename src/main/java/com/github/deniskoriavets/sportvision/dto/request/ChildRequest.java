@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 public record ChildRequest(
-    @NotBlank
+    @NotBlank(message = "First name must not be blank")
     String firstName,
-    @NotBlank
+    @NotBlank(message = "Last name must not be blank")
     String lastName,
     @ValidChildAge
     LocalDate birthDate

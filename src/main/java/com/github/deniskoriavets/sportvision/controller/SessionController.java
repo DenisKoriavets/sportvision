@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/sessions")
 @RequiredArgsConstructor
-@Tag(name = "Sessions & Attendance", description = "Управління тренуваннями та відвідуваністю")
+@Tag(name = "Sessions & Attendance", description = "Managing training sessions and attendance")
 public class SessionController {
 
     private final SessionService sessionService;
@@ -34,7 +34,7 @@ public class SessionController {
 
     @PostMapping("/generate")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Згенерувати заняття на основі розкладу на період")
+    @Operation(summary = "Generate sessions from schedule for a date range")
     public ResponseEntity<Void> generateSessions(@Valid @RequestBody
                                                  SessionGenerationRequest request) {
         sessionService.generateSessions(request);
@@ -43,7 +43,7 @@ public class SessionController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
-    @Operation(summary = "Створити разове заняття вручну")
+    @Operation(summary = "Create a one-off session manually")
     public ResponseEntity<SessionResponse> createManualSession(@Valid @RequestBody
                                                                SessionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(sessionService.createManualSession(request));
@@ -51,14 +51,14 @@ public class SessionController {
 
     @PutMapping("/{id}/cancel")
     @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
-    @Operation(summary = "Скасувати заняття з вказанням причини")
+    @Operation(summary = "Cancel a session with a reason")
     public ResponseEntity<Void> cancelSession(@PathVariable UUID id, @RequestParam String reason) {
         sessionService.cancelSession(id, reason);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/group/{groupId}")
-    @Operation(summary = "Отримати список занять групи за період")
+    @Operation(summary = "Get sessions for a group within a date range")
     public ResponseEntity<List<SessionResponse>> getGroupSessions(
             @PathVariable UUID groupId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
@@ -68,7 +68,7 @@ public class SessionController {
 
     @PostMapping("/{id}/attendance")
     @PreAuthorize("hasAnyRole('COACH', 'ADMIN')")
-    @Operation(summary = "Відмітити відвідування (масово)")
+    @Operation(summary = "Mark bulk attendance for a session")
     public ResponseEntity<Void> markAttendance(
             @PathVariable UUID id,
             @RequestBody @Valid List<ChildAttendanceDto> attendances) {
@@ -77,7 +77,7 @@ public class SessionController {
     }
 
     @GetMapping
-    @Operation(summary = "Пошук та фільтрація занять з пагінацією")
+    @Operation(summary = "Search and filter sessions with pagination")
     public ResponseEntity<Page<SessionResponse>> searchSessions(
         SessionSearchCriteria criteria,
         Pageable pageable) {

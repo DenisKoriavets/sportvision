@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Password {
-    String message() default "Пароль повинен бути від 8 символів і містити хоча б одну цифру та одну велику літеру";
+    String message() default "Password must be at least 8 characters and contain at least one digit and one uppercase letter";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

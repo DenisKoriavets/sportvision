@@ -47,7 +47,7 @@ class GroupControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("ADMIN може створити групу — 201")
+    @DisplayName("ADMIN can create a group — returns 201")
     void createGroup_Success_AsAdmin() throws Exception {
         GroupRequest request = new GroupRequest("Група А", section.getId(), coach.getId(), 15, 7, 12);
 
@@ -60,7 +60,7 @@ class GroupControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("PARENT не може створити групу — 403")
+    @DisplayName("PARENT cannot create a group — returns 403")
     void createGroup_Forbidden_AsParent() throws Exception {
         GroupRequest request = new GroupRequest("Група А", section.getId(), null, 15, 7, 12);
 
@@ -72,7 +72,7 @@ class GroupControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Отримання списку груп доступне всім авторизованим")
+    @DisplayName("Get groups is available to all authenticated users")
     void getGroups_Success() throws Exception {
         groupRepository.save(Group.builder()
             .name("Тестова Група").section(section).coach(coach).maxCapacity(10).build());
@@ -84,7 +84,7 @@ class GroupControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Валідація @ValidAgePeriod — ageMin > ageMax повертає 400")
+    @DisplayName("Validation @ValidAgePeriod — ageMin greater than ageMax returns 400")
     void createGroup_Fails_WhenAgeMinGreaterThanAgeMax() throws Exception {
         GroupRequest request = new GroupRequest("Погана Група", section.getId(), null, 10, 15, 7);
 
@@ -96,7 +96,7 @@ class GroupControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("ADMIN може видалити групу — 204")
+    @DisplayName("ADMIN can delete a group — returns 204")
     void deleteGroup_Success_AsAdmin() throws Exception {
         Group group = groupRepository.save(Group.builder()
             .name("Delete Me").section(section).coach(coach).maxCapacity(5).build());
@@ -107,7 +107,7 @@ class GroupControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Отримання неіснуючої групи повертає 404")
+    @DisplayName("Get non-existent group — returns 404")
     void getGroupById_NotFound() throws Exception {
         mockMvc.perform(get("/api/v1/groups/" + java.util.UUID.randomUUID())
                 .header("Authorization", parentToken))

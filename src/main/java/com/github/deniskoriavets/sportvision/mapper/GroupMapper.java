@@ -34,7 +34,7 @@ public interface GroupMapper {
     Group toEntity(GroupRequest request);
 
     default String mapCoachName(Parent coach) {
-        if (coach == null) return "Тренер не призначений";
+        if (coach == null) return "No coach assigned";
         return coach.getFirstName() + " " + coach.getLastName();
     }
 }

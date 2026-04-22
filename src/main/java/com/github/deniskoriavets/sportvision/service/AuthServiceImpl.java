@@ -91,11 +91,11 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public AuthResponse refresh(String refreshTokenRequest) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenRequest)
-            .orElseThrow(() -> new InvalidTokenException("Невірний Refresh Token"));
+            .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));
 
         if (refreshToken.getExpiryDate().isBefore(Instant.now()) || refreshToken.isRevoked()) {
             refreshTokenRepository.delete(refreshToken);
-            throw new TokenExpiredException("Refresh токен прострочений або відкликаний");
+            throw new TokenExpiredException("Refresh token is expired or revoked");
         }
 
         Parent parent = refreshToken.getParent();
@@ -116,11 +116,11 @@ public class AuthServiceImpl implements AuthService {
     public void verifyEmail(String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
             .orElseThrow(() -> new InvalidTokenException(
-                "Токен підтвердження не знайдено або він невірний"));
+                "Verification token not found or invalid"));
 
         if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             verificationTokenRepository.delete(verificationToken);
-            throw new TokenExpiredException("Термін дії посилання для підтвердження минув");
+            throw new TokenExpiredException("Verification link has expired");
         }
 
         Parent parent = verificationToken.getParent();

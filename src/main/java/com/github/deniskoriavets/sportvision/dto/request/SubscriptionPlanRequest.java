@@ -10,11 +10,11 @@ import java.util.UUID;
 
 @ValidSubscriptionPlan
 public record SubscriptionPlanRequest(
-    @NotBlank String name,
-    @PositiveOrZero BigDecimal price,
+    @NotBlank(message = "Plan name must not be blank") String name,
+    @PositiveOrZero(message = "Price must be zero or positive") BigDecimal price,
     Integer sessionsCount,
-    @NotNull UUID sectionId,
-    @Min(1) Integer validityDays,
+    @NotNull(message = "Section ID must not be null") UUID sectionId,
+    @Min(value = 1, message = "Validity days must be at least 1") Integer validityDays,
     Boolean isUnlimited
     ) {
 }

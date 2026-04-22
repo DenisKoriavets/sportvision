@@ -19,7 +19,7 @@ public class SecurityFacade {
         if (authentication != null && authentication.getPrincipal() instanceof Parent parent) {
             return parent;
         }
-        throw new IllegalStateException("Користувач не автентифікований");
+        throw new IllegalStateException("User is not authenticated");
     }
 
     public UUID getCurrentUserId() {

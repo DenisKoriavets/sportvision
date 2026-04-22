@@ -41,7 +41,7 @@ class AuthServiceImplTest {
     @InjectMocks private AuthServiceImpl authService;
 
     @Test
-    @DisplayName("Успішна реєстрація нового батька")
+    @DisplayName("Registers new parent successfully")
     void register_Success() {
         RegisterRequest request = new RegisterRequest("test@test.com", "Password123!", "Іван", "Іванов");
 
@@ -56,7 +56,7 @@ class AuthServiceImplTest {
     }
 
     @Test
-    @DisplayName("Помилка реєстрації якщо email вже зайнятий")
+    @DisplayName("Throws exception when email is already taken")
     void register_ThrowsException_WhenEmailTaken() {
         RegisterRequest request = new RegisterRequest("test@test.com", "Password123!", "Іван", "Іванов");
         when(parentRepository.save(any())).thenThrow(DataIntegrityViolationException.class);
@@ -65,7 +65,7 @@ class AuthServiceImplTest {
     }
 
     @Test
-    @DisplayName("Успішний вхід у систему")
+    @DisplayName("Login succeeds with valid credentials")
     void login_Success() {
         LoginRequest request = new LoginRequest("test@test.com", "Password123!");
         Parent parent = Parent.builder()

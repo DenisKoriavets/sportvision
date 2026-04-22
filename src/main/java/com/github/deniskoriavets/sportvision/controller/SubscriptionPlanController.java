@@ -27,12 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/subscription-plans")
 @RequiredArgsConstructor
-@Tag(name = "Subscription Plans", description = "Управління тарифними планами секцій")
+@Tag(name = "Subscription Plans", description = "Managing subscription plans for sections")
 public class SubscriptionPlanController {
     private final SubscriptionPlanService subscriptionPlanService;
 
     @GetMapping
-    @Operation(summary = "Отримати всі доступні тарифні плани")
+    @Operation(summary = "Get all available subscription plans")
     public ResponseEntity<Page<SubscriptionPlanResponse>> getSubscriptionPlans(@ParameterObject
                                                                                SubscriptionPlanSearchCriteria searchCriteria,
                                                                                @ParameterObject
@@ -42,7 +42,7 @@ public class SubscriptionPlanController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Отримати тарифний план за ID")
+    @Operation(summary = "Get subscription plan by ID")
     public ResponseEntity<SubscriptionPlanResponse> getSubscriptionPlanById(@PathVariable("id")
                                                                             UUID id) {
         return ResponseEntity.ok(subscriptionPlanService.getSubscriptionPlanById(id));
@@ -50,7 +50,7 @@ public class SubscriptionPlanController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Створити новий тарифний план (Тільки для ADMIN)")
+    @Operation(summary = "Create a new subscription plan")
     public ResponseEntity<SubscriptionPlanResponse> createSubscriptionPlan(@RequestBody
                                                                            @Valid
                                                                            SubscriptionPlanRequest request) {
@@ -60,7 +60,7 @@ public class SubscriptionPlanController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Оновити існуючий тарифний план (Тільки для ADMIN)")
+    @Operation(summary = "Update a subscription plan")
     public ResponseEntity<SubscriptionPlanResponse> updateSubscriptionPlan(
         @PathVariable("id") UUID id,
         @RequestBody @Valid SubscriptionPlanRequest request
@@ -70,7 +70,7 @@ public class SubscriptionPlanController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Видалити тарифний план (Тільки для ADMIN)")
+    @Operation(summary = "Delete a subscription plan")
     public ResponseEntity<Void> deleteSubscriptionPlan(@PathVariable("id") UUID id) {
         subscriptionPlanService.deleteSubscriptionPlan(id);
         return ResponseEntity.noContent().build();
