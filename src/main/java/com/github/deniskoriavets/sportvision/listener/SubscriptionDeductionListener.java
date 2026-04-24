@@ -6,10 +6,11 @@ import com.github.deniskoriavets.sportvision.event.AttendanceMarkedEvent;
 import com.github.deniskoriavets.sportvision.repository.SessionRepository;
 import com.github.deniskoriavets.sportvision.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class SubscriptionDeductionListener {
     private final SessionRepository sessionRepository;
     private final SubscriptionRepository subscriptionRepository;
 
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onAttendanceMarked(AttendanceMarkedEvent event) {
         if (event.status() != AttendanceStatus.PRESENT) {
