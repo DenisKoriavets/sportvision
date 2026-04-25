@@ -24,11 +24,13 @@ public class SessionCancellationListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onSessionCancelled(SessionCancelledEvent event) {
         var attendancesOnSession = attendanceRepository.findAllBySessionId(event.sessionId());
+        if (attendancesOnSession.isEmpty()) return;
+        var sectionId = attendancesOnSession.getFirst().getSession().getGroup().getSection().getId();
         for (var attendance : attendancesOnSession) {
             if (attendance.getStatus() == AttendanceStatus.PRESENT) {
                 var subscription = subscriptionRepository.findFirstByChildIdAndSubscriptionPlanSectionIdAndStatusIn(
                         attendance.getChild().getId(),
-                        attendance.getSession().getGroup().getSection().getId(),
+                        sectionId,
                         List.of(SubscriptionStatus.ACTIVE, SubscriptionStatus.EXPIRED))
                     .orElseThrow(() -> new IllegalStateException(
                         "Subscription not found for child and section"));
