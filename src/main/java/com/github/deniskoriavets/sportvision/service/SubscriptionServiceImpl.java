@@ -1,22 +1,32 @@
 package com.github.deniskoriavets.sportvision.service;
 
+import com.github.deniskoriavets.sportvision.dto.request.PaymentRequest;
 import com.github.deniskoriavets.sportvision.dto.request.SubscriptionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.PaymentResponse;
 import com.github.deniskoriavets.sportvision.dto.response.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.entity.Child;
+import com.github.deniskoriavets.sportvision.entity.Payment;
 import com.github.deniskoriavets.sportvision.entity.Subscription;
+import com.github.deniskoriavets.sportvision.entity.enums.PaymentStatus;
 import com.github.deniskoriavets.sportvision.entity.enums.SubscriptionStatus;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.SubscriptionMapper;
 import com.github.deniskoriavets.sportvision.repository.ChildRepository;
+import com.github.deniskoriavets.sportvision.repository.PaymentRepository;
 import com.github.deniskoriavets.sportvision.repository.SubscriptionPlanRepository;
 import com.github.deniskoriavets.sportvision.repository.SubscriptionRepository;
 import com.github.deniskoriavets.sportvision.security.SecurityFacade;
+import com.github.deniskoriavets.sportvision.service.interfaces.PaymentGateway;
 import com.github.deniskoriavets.sportvision.service.interfaces.SubscriptionService;
+import com.stripe.exception.StripeException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +40,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final ChildRepository childRepository;
     private final SecurityFacade securityFacade;
+    private final PaymentGateway paymentGateway;
+    private final PaymentRepository paymentRepository;
 
     @Override
     @Transactional
@@ -101,6 +113,25 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
 
         return subscriptionMapper.toResponse(subscription);
+    }
+
+    @Override
+    @Transactional
+    public PaymentResponse initiatePayment(PaymentRequest request)
+        throws StripeException {
+        var child = getChildIfOwner(request.childId());
+        var subscriptionPlan = subscriptionPlanRepository.findById(request.subscriptionPlanId())
+            .orElseThrow(() -> new ResourceNotFoundException("Subscription plan not found"));
+
+        var payment = Payment.builder()
+            .amount(subscriptionPlan.getPrice())
+            .createdAt(LocalDateTime.now())
+            .status(PaymentStatus.PENDING)
+            .build();
+        paymentRepository.save(payment);
+        var metadata = Map.of("payment_id", payment.getId().toString(), "plan_id",
+            subscriptionPlan.getId().toString(), "child_id", child.getId().toString());
+        return paymentGateway.createPaymentSession(payment.getAmount().longValue() * 100, "UAH", subscriptionPlan.getName(), metadata);
     }
 
     private Child getChildIfOwner(UUID id) {
