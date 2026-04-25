@@ -24,4 +24,8 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
     );
 
     Optional<Subscription> findFirstByChildIdAndSubscriptionPlanSectionIdAndStatus(UUID childId, UUID sectionId, SubscriptionStatus status);
+
+    Optional<Subscription> findFirstByChildIdAndSubscriptionPlanSectionIdAndStatusIn(UUID childId,
+                                                                                     UUID sectionId,
+                                                                                     Collection<SubscriptionStatus> status);
 }
