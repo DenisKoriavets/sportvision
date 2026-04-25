@@ -9,4 +9,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, UUID> {
     boolean existsBySessionIdAndChildId(UUID sessionId, UUID childId);
 
     List<Attendance> findAllByChildId(UUID childId);
+
+    List<Attendance> findAllBySessionId(UUID sessionId);
 }

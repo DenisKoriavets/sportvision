@@ -6,6 +6,7 @@ import com.github.deniskoriavets.sportvision.dto.response.SessionResponse;
 import com.github.deniskoriavets.sportvision.dto.criteria.SessionSearchCriteria;
 import com.github.deniskoriavets.sportvision.entity.Session;
 import com.github.deniskoriavets.sportvision.entity.enums.SessionStatus;
+import com.github.deniskoriavets.sportvision.event.SessionCancelledEvent;
 import com.github.deniskoriavets.sportvision.mapper.SessionMapper;
 import com.github.deniskoriavets.sportvision.repository.GroupRepository;
 import com.github.deniskoriavets.sportvision.repository.ScheduleRepository;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class SessionServiceImpl implements SessionService {
     private final ScheduleRepository scheduleRepository;
     private final GroupRepository groupRepository;
     private final SessionMapper sessionMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -99,6 +102,7 @@ public class SessionServiceImpl implements SessionService {
         session.setStatus(SessionStatus.CANCELLED);
         session.setCancelReason(reason);
         sessionRepository.save(session);
+        eventPublisher.publishEvent(new SessionCancelledEvent(sessionId, reason));
     }
 
     @Override
