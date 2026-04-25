@@ -8,6 +8,7 @@ import com.github.deniskoriavets.sportvision.entity.Schedule;
 import com.github.deniskoriavets.sportvision.entity.Session;
 import com.github.deniskoriavets.sportvision.entity.enums.DayOfWeek;
 import com.github.deniskoriavets.sportvision.entity.enums.SessionStatus;
+import com.github.deniskoriavets.sportvision.event.SessionCancelledEvent;
 import com.github.deniskoriavets.sportvision.mapper.SessionMapper;
 import com.github.deniskoriavets.sportvision.repository.GroupRepository;
 import com.github.deniskoriavets.sportvision.repository.ScheduleRepository;
@@ -25,6 +26,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.context.ApplicationEventPublisher;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -37,6 +39,7 @@ class SessionServiceImplTest {
     @Mock private ScheduleRepository scheduleRepository;
     @Mock private GroupRepository groupRepository;
     @Mock private SessionMapper sessionMapper;
+    @Mock private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks private SessionServiceImpl sessionService;
 
@@ -119,6 +122,7 @@ class SessionServiceImplTest {
         assertEquals(SessionStatus.CANCELLED, session.getStatus());
         assertEquals("Тренер захворів", session.getCancelReason());
         verify(sessionRepository).save(session);
+        verify(eventPublisher).publishEvent(any(SessionCancelledEvent.class));
     }
 
     @Test
