@@ -1,6 +1,7 @@
 package com.github.deniskoriavets.sportvision.exception;
 
 import com.github.deniskoriavets.sportvision.dto.response.ErrorResponse;
+import com.stripe.exception.StripeException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,13 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(StripeException.class)
+    public ResponseEntity<ErrorResponse> handleStripeException(
+        StripeException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_GATEWAY, "Payment service error",
+            "Payment processing failed. Please try again later.", request.getRequestURI(), null);
+    }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
     public ResponseEntity<ErrorResponse> handleMissingHeader(

@@ -1,7 +1,10 @@
 package com.github.deniskoriavets.sportvision.service;
 
+import com.github.deniskoriavets.sportvision.dto.NotificationMessage;
+import com.github.deniskoriavets.sportvision.entity.enums.NotificationPreference;
 import com.github.deniskoriavets.sportvision.exception.EmailSendingException;
 import com.github.deniskoriavets.sportvision.service.interfaces.EmailService;
+import com.github.deniskoriavets.sportvision.service.interfaces.NotificationStrategy;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -18,7 +21,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SendGridEmailService implements EmailService {
+public class SendGridEmailService implements EmailService, NotificationStrategy {
 
     private final SendGrid sendGrid;
 
@@ -31,17 +34,37 @@ public class SendGridEmailService implements EmailService {
     @Override
     public void sendVerificationEmail(String to, String token) {
         String fullUrl = verificationUrl + "?token=" + token;
-
         Email from = new Email(fromEmail);
         Email recipient = new Email(to);
         String subject = "Please verify your email";
-
         Content content = new Content("text/html",
-            "<h1>Welcome!</h1><p>Please click <a href=\"" + fullUrl + "\">here</a> to verify your account.</p>");
+            "<h1>Welcome!</h1><p>Please click <a href=\"" + fullUrl +
+                "\">here</a> to verify your account.</p>");
 
         Mail mail = new Mail(from, subject, recipient, content);
-        Request request = new Request();
+        executeSend(mail, to);
+    }
 
+    @Override
+    public boolean supports(NotificationPreference preference) {
+        return preference == NotificationPreference.EMAIL;
+    }
+
+    @Override
+    public void send(NotificationMessage message) {
+        Email from = new Email(fromEmail);
+        Email recipient = new Email(message.recipient());
+
+        Content content = new Content("text/html", message.content());
+
+        Mail mail = new Mail(from, message.subject(), recipient, content);
+        executeSend(mail, message.recipient());
+
+        log.info("Notification email sent successfully to: {}", message.recipient());
+    }
+
+    private void executeSend(Mail mail, String recipientEmail) {
+        Request request = new Request();
         try {
             request.setMethod(Method.POST);
             request.setEndpoint("mail/send");
@@ -50,11 +73,13 @@ public class SendGridEmailService implements EmailService {
             Response response = sendGrid.api(request);
 
             if (response.getStatusCode() >= 400) {
-                log.error("SendGrid error: Status {} Body {}", response.getStatusCode(), response.getBody());
-                throw new EmailSendingException("Failed to send email via SendGrid");
+                log.error("SendGrid error: Status {} Body {}", response.getStatusCode(),
+                    response.getBody());
+                throw new EmailSendingException(
+                    "Failed to send email via SendGrid to " + recipientEmail);
             }
         } catch (IOException ex) {
-            log.error("IO error while sending email to {}", to, ex);
+            log.error("IO error while sending email to {}", recipientEmail, ex);
             throw new EmailSendingException("Error connecting to email service");
         }
     }
