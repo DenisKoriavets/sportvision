@@ -30,12 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    @Operation(summary = "Purchase a subscription for a child")
-    @PostMapping("/buy")
-    public ResponseEntity<SubscriptionResponse> buy(
-        @Valid @RequestBody SubscriptionRequest subscriptionRequest) {
+    @Operation(summary = "Admin only: Purchase a subscription using cash")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin/buy")
+    public ResponseEntity<SubscriptionResponse> buyForCash(
+        @Valid @RequestBody SubscriptionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(subscriptionService.buySubscription(subscriptionRequest));
+            .body(subscriptionService.buySubscriptionManual(request));
     }
 
     @Operation(summary = "Get all subscriptions for a child")

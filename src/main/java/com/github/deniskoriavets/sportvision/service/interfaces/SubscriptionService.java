@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface SubscriptionService {
-    SubscriptionResponse buySubscription(SubscriptionRequest subscriptionRequest);
+    SubscriptionResponse buySubscriptionManual(SubscriptionRequest request);
 
     List<SubscriptionResponse> getChildSubscriptions(UUID childId);
 

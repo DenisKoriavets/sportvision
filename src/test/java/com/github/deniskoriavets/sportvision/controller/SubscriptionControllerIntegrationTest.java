@@ -1,6 +1,7 @@
 package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.BaseIntegrationTest;
+import com.github.deniskoriavets.sportvision.dto.request.PaymentRequest;
 import com.github.deniskoriavets.sportvision.dto.request.SubscriptionRequest;
 import com.github.deniskoriavets.sportvision.entity.*;
 import com.github.deniskoriavets.sportvision.entity.enums.Role;
@@ -56,10 +57,20 @@ class SubscriptionControllerIntegrationTest extends BaseIntegrationTest {
             .name("8 Sessions").price(new BigDecimal("1200")).sessionsCount(8)
             .validityDays(30).isActive(true).section(section).isUnlimited(false).build());
 
-        String token = "Bearer " + jwtService.generateAccessToken(parent);
+        Parent admin = parentRepository.save(Parent.builder()
+            .email("admin@test.com")
+            .passwordHash("h")
+            .firstName("Admin")
+            .lastName("User")
+            .role(Role.ADMIN)
+            .isEmailVerified(true)
+            .isActive(true)
+            .build());
+
+        String token = "Bearer " + jwtService.generateAccessToken(admin);
         SubscriptionRequest request = new SubscriptionRequest(child.getId(), plan.getId());
 
-        mockMvc.perform(post("/api/v1/subscriptions/buy")
+        mockMvc.perform(post("/api/v1/subscriptions/admin/buy")
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))

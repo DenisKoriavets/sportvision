@@ -51,13 +51,35 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional
-    public SubscriptionResponse buySubscription(SubscriptionRequest subscriptionRequest) {
-        var child = getChildIfOwner(subscriptionRequest.childId());
-        var plan = subscriptionPlanRepository.findById(subscriptionRequest.planId())
+    public SubscriptionResponse buySubscriptionManual(SubscriptionRequest request) {
+        var child = getChildIfOwnerAdmin(request.childId());
+        var plan = subscriptionPlanRepository.findById(request.planId())
             .orElseThrow(() -> new ResourceNotFoundException("Subscription plan not found"));
 
-        var savedSubscription = createPendingSubscriptionEntity(child, plan);
-        return subscriptionMapper.toResponse(savedSubscription);
+        var subscription = createPendingSubscriptionEntity(child, plan);
+
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        subscription.setStartDate(LocalDate.now());
+        subscription.setEndDate(LocalDate.now().plusDays(plan.getValidityDays()));
+        subscriptionRepository.save(subscription);
+
+        var payment = Payment.builder()
+            .subscription(subscription)
+            .amount(plan.getPrice())
+            .status(PaymentStatus.PAID)
+            .stripeSessionId("CASH_ADMIN_" + UUID.randomUUID())
+            .createdAt(LocalDateTime.now())
+            .build();
+        paymentRepository.save(payment);
+
+        eventPublisher.publishEvent(new PaymentSuccessEvent(
+            payment.getId(),
+            payment.getAmount().intValue() * 100,
+            plan.getId(),
+            child.getId()
+        ));
+
+        return subscriptionMapper.toResponse(subscription);
     }
 
     @Override
@@ -187,5 +209,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             throw new AccessDeniedException("Access to this child's data is denied");
         }
         return child;
+    }
+
+    private Child getChildIfOwnerAdmin(UUID id) {
+        return childRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
     }
 }
