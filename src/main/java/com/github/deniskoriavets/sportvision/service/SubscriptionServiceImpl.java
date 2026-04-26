@@ -9,6 +9,7 @@ import com.github.deniskoriavets.sportvision.entity.Payment;
 import com.github.deniskoriavets.sportvision.entity.Subscription;
 import com.github.deniskoriavets.sportvision.entity.enums.PaymentStatus;
 import com.github.deniskoriavets.sportvision.entity.enums.SubscriptionStatus;
+import com.github.deniskoriavets.sportvision.event.PaymentSuccessEvent;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.SubscriptionMapper;
 import com.github.deniskoriavets.sportvision.repository.ChildRepository;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
@@ -42,6 +46,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final SecurityFacade securityFacade;
     private final PaymentGateway paymentGateway;
     private final PaymentRepository paymentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -131,7 +136,33 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         paymentRepository.save(payment);
         var metadata = Map.of("payment_id", payment.getId().toString(), "plan_id",
             subscriptionPlan.getId().toString(), "child_id", child.getId().toString());
-        return paymentGateway.createPaymentSession(payment.getAmount().longValue() * 100, "UAH", subscriptionPlan.getName(), metadata);
+        return paymentGateway.createPaymentSession(payment.getAmount().longValue() * 100, "UAH",
+            subscriptionPlan.getName(), metadata);
+    }
+
+    @Override
+    @Transactional
+    public void completePayment(UUID paymentId) {
+        var payment = paymentRepository.findById(paymentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
+        if (payment.getStatus() == PaymentStatus.PAID) {
+            log.info("Payment {} already processed. Skipping.", paymentId);
+            return;
+        }
+
+        payment.setStatus(PaymentStatus.PAID);
+        paymentRepository.save(payment);
+
+        var subscription = payment.getSubscription();
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        subscription.setStartDate(LocalDate.now());
+        subscription.setEndDate(
+            LocalDate.now().plusDays(subscription.getSubscriptionPlan().getValidityDays()));
+        subscriptionRepository.save(subscription);
+
+        eventPublisher.publishEvent(
+            new PaymentSuccessEvent(payment.getId(), payment.getAmount().intValue() * 100,
+                subscription.getSubscriptionPlan().getId(), subscription.getChild().getId()));
     }
 
     private Child getChildIfOwner(UUID id) {

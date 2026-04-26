@@ -26,3 +26,4 @@ sportvision:
     secret-key: ${STRIPE_SECRET_KEY}
     success-url: "http://localhost:3000/payment/success" # Заглушка для фронтенда
     cancel-url: "http://localhost:3000/payment/cancel"   # Заглушка для фронтенда
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET}

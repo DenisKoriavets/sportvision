@@ -19,4 +19,6 @@ public interface SubscriptionService {
     SubscriptionResponse getSubscriptionById(UUID id);
 
     PaymentResponse initiatePayment(PaymentRequest request) throws StripeException;
+
+    void completePayment(UUID paymentId);
 }
