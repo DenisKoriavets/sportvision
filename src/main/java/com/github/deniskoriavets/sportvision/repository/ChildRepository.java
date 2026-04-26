@@ -11,4 +11,6 @@ public interface ChildRepository extends JpaRepository<Child, UUID>,
     List<Child> findAllByParentId(UUID parentId);
 
     Integer countByGroupId(UUID groupId);
+
+    List<Child> findAllByGroupId(UUID groupId);
 }
