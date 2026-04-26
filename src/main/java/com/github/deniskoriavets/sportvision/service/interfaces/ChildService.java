@@ -26,4 +26,6 @@ public interface ChildService {
     List<AttendanceResponse> getChildAttendance(UUID childId);
 
     List<SubscriptionResponse> getChildSubscriptions(UUID childId);
+
+    List<ChildResponse> getChildrenByGroupId(UUID groupId);
 }

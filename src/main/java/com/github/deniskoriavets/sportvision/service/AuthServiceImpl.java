@@ -140,6 +140,13 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalStateException("Email is already verified");
         }
 
+        verificationTokenRepository.findByParent(parent).ifPresent(existing -> {
+            if (existing.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(2))) {
+                throw new IllegalStateException(
+                    "Please wait 2 minutes before requesting a new verification email");
+            }
+        });
+
         verificationTokenRepository.deleteByParent(parent);
 
         String token = UUID.randomUUID().toString();
@@ -150,7 +157,6 @@ public class AuthServiceImpl implements AuthService {
             .build();
 
         verificationTokenRepository.save(verificationToken);
-
         emailService.sendVerificationEmail(parent.getEmail(), token);
     }
 

@@ -1,12 +1,15 @@
 package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.dto.request.GroupRequest;
+import com.github.deniskoriavets.sportvision.dto.response.ChildResponse;
 import com.github.deniskoriavets.sportvision.dto.response.GroupResponse;
 import com.github.deniskoriavets.sportvision.dto.criteria.GroupSearchCriteria;
+import com.github.deniskoriavets.sportvision.service.interfaces.ChildService;
 import com.github.deniskoriavets.sportvision.service.interfaces.GroupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -25,6 +28,7 @@ import java.util.UUID;
 public class GroupController {
 
     private final GroupService groupService;
+    private final ChildService childService;
 
     @GetMapping
     @Operation(summary = "Get groups with filtering and pagination")
@@ -64,5 +68,12 @@ public class GroupController {
     public ResponseEntity<Void> deleteGroup(@PathVariable UUID id) {
         groupService.deleteGroup(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/children")
+    @PreAuthorize("hasAnyRole('COACH', 'ADMIN')")
+    @Operation(summary = "Get all children in a group")
+    public ResponseEntity<List<ChildResponse>> getChildrenByGroup(@PathVariable UUID id) {
+        return ResponseEntity.ok(childService.getChildrenByGroupId(id));
     }
 }

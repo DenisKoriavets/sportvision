@@ -125,4 +125,11 @@ public class ChildServiceImpl implements ChildService {
             .map(subscriptionMapper::toResponse)
             .toList();
     }
+
+    @Override
+    public List<ChildResponse> getChildrenByGroupId(UUID groupId) {
+        return childRepository.findAllByGroupId(groupId).stream()
+            .map(childMapper::toResponse)
+            .toList();
+    }
 }

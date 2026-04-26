@@ -10,4 +10,6 @@ public interface VerificationTokenRepository extends JpaRepository<VerificationT
     Optional<VerificationToken> findByToken(String token);
 
     void deleteByParent(Parent parent);
+
+    Optional<VerificationToken> findByParent(Parent parent);
 }

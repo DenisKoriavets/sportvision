@@ -60,6 +60,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public void unenrollChild(EnrollmentRequest enrollmentRequest) {
         var child = getChildIfOwner(enrollmentRequest.childId());
+
+        if (child.getGroup() == null) {
+            throw new IllegalStateException("Child is not enrolled in any group");
+        }
+
         child.setGroup(null);
         childRepository.save(child);
     }

@@ -25,6 +25,10 @@ public class GroupSpecifications {
                 predicates.add(cb.equal(root.get("section").get("id"), criteria.sectionId()));
             }
 
+            if (criteria.coachId() != null) {
+                predicates.add(cb.equal(root.get("coach").get("id"), criteria.coachId()));
+            }
+
             if (criteria.hasAvailableSlots() != null && criteria.hasAvailableSlots()) {
                 Subquery<Long> subquery = query.subquery(Long.class);
                 Root<Child> childRoot = subquery.from(Child.class);
