@@ -12,6 +12,7 @@ import com.github.deniskoriavets.sportvision.repository.ParentRepository;
 import com.github.deniskoriavets.sportvision.repository.SectionRepository;
 import com.github.deniskoriavets.sportvision.repository.specification.GroupSpecifications;
 import com.github.deniskoriavets.sportvision.service.interfaces.GroupService;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -104,5 +105,13 @@ public class GroupServiceImpl implements GroupService {
         var group = groupRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Group not found with id: " + id));
         groupRepository.delete(group);
+    }
+
+    @Override
+    public List<GroupResponse> getGroupsByCoachId(UUID coachId) {
+        return groupRepository.findAllByCoachId(coachId)
+            .stream()
+            .map(groupMapper::toResponse)
+            .toList();
     }
 }

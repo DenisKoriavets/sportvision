@@ -29,5 +29,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
                                                                                      UUID sectionId,
                                                                                      Collection<SubscriptionStatus> status);
 
-    List<Subscription> findAllByStatusAndRemainingSessionsLessThan(SubscriptionStatus status, Integer remainingSessionsIsLessThan);
+    List<Subscription> findAllByStatusAndRemainingSessionsLessThanEqual(SubscriptionStatus status, Integer remainingSessions);
+
+    long countByStatus(SubscriptionStatus status);
 }

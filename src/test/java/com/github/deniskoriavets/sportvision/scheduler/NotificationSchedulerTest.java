@@ -67,7 +67,7 @@ class NotificationSchedulerTest {
         mockChild.setParent(mockParent);
         mockSubscription.setChild(mockChild);
 
-        when(subscriptionRepository.findAllByStatusAndRemainingSessionsLessThan(
+        when(subscriptionRepository.findAllByStatusAndRemainingSessionsLessThanEqual(
             eq(SubscriptionStatus.ACTIVE), eq(2)))
             .thenReturn(List.of(mockSubscription));
 

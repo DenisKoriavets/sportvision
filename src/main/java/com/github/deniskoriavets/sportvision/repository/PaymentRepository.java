@@ -2,14 +2,20 @@ package com.github.deniskoriavets.sportvision.repository;
 
 import com.github.deniskoriavets.sportvision.entity.Payment;
 import com.github.deniskoriavets.sportvision.entity.enums.PaymentStatus;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     Optional<Payment> findByStripeSessionId(String stripeSessionId);
 
     List<Payment> findAllByStatusAndCreatedAtBefore(PaymentStatus status, LocalDateTime time);
+
+    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.status = :status")
+    BigDecimal sumAmountByStatus(@Param("status") PaymentStatus status);
 }

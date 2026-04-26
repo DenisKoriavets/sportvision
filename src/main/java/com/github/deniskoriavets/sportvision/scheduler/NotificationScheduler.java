@@ -34,7 +34,7 @@ public class NotificationScheduler {
     @Scheduled(cron = "0 0 9 * * *")
     public void scheduleSubscriptionExpiryReminders() {
         var expiringSubscriptions =
-            subscriptionRepository.findAllByStatusAndRemainingSessionsLessThan(
+            subscriptionRepository.findAllByStatusAndRemainingSessionsLessThanEqual(
                 SubscriptionStatus.ACTIVE, 2
             );
         expiringSubscriptions.forEach(subscription -> {
