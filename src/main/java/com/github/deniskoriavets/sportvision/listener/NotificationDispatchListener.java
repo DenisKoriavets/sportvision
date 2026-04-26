@@ -30,6 +30,12 @@ public class NotificationDispatchListener {
     }
 
     @EventListener
+    public void handlePaymentExpired(PaymentExpiredEvent event) {
+        log.info("[NOTIFICATION HUB] | Payment EXPIRED for child: {}. Parent: {}. Sending notification...",
+            event.childId(), event.parentId());
+    }
+
+    @EventListener
     public void handleSubscriptionLow(SubscriptionLowEvent event) {
         log.info("[NOTIFICATION HUB] | Subscription LOW for parent: {}. Only {} sessions left!",
             event.parentId(), event.remainingSessions());

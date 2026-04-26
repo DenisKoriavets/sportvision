@@ -1,28 +1,43 @@
 package com.github.deniskoriavets.sportvision.service;
 
+import com.github.deniskoriavets.sportvision.dto.request.PaymentRequest;
 import com.github.deniskoriavets.sportvision.dto.request.SubscriptionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.PaymentResponse;
 import com.github.deniskoriavets.sportvision.dto.response.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.entity.Child;
+import com.github.deniskoriavets.sportvision.entity.Payment;
 import com.github.deniskoriavets.sportvision.entity.Subscription;
+import com.github.deniskoriavets.sportvision.entity.SubscriptionPlan;
+import com.github.deniskoriavets.sportvision.entity.enums.PaymentStatus;
 import com.github.deniskoriavets.sportvision.entity.enums.SubscriptionStatus;
+import com.github.deniskoriavets.sportvision.event.PaymentSuccessEvent;
 import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.SubscriptionMapper;
 import com.github.deniskoriavets.sportvision.repository.ChildRepository;
+import com.github.deniskoriavets.sportvision.repository.PaymentRepository;
 import com.github.deniskoriavets.sportvision.repository.SubscriptionPlanRepository;
 import com.github.deniskoriavets.sportvision.repository.SubscriptionRepository;
 import com.github.deniskoriavets.sportvision.security.SecurityFacade;
+import com.github.deniskoriavets.sportvision.service.interfaces.PaymentGateway;
 import com.github.deniskoriavets.sportvision.service.interfaces.SubscriptionService;
+import com.stripe.exception.StripeException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
@@ -30,37 +45,41 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final ChildRepository childRepository;
     private final SecurityFacade securityFacade;
+    private final PaymentGateway paymentGateway;
+    private final PaymentRepository paymentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
-    public SubscriptionResponse buySubscription(SubscriptionRequest subscriptionRequest) {
-        var child = getChildIfOwner(subscriptionRequest.childId());
-        var plan = subscriptionPlanRepository.findById(subscriptionRequest.planId())
+    public SubscriptionResponse buySubscriptionManual(SubscriptionRequest request) {
+        var child = getChildIfOwnerAdmin(request.childId());
+        var plan = subscriptionPlanRepository.findById(request.planId())
             .orElseThrow(() -> new ResourceNotFoundException("Subscription plan not found"));
 
-        if (!plan.isActive()) {
-            throw new IllegalStateException("Subscription plan is not active");
-        }
+        var subscription = createPendingSubscriptionEntity(child, plan);
 
-        if (subscriptionRepository.existsByChildIdAndSubscriptionPlanSectionIdAndStatusIn(
-            child.getId(), plan.getSection().getId(), List.of(
-                SubscriptionStatus.ACTIVE, SubscriptionStatus.PENDING_PAYMENT))) {
-            throw new IllegalStateException(
-                "Child already has an active or pending subscription for this section");
-        }
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        subscription.setStartDate(LocalDate.now());
+        subscription.setEndDate(LocalDate.now().plusDays(plan.getValidityDays()));
+        subscriptionRepository.save(subscription);
 
-        var subscription = Subscription.builder()
-            .child(child)
-            .subscriptionPlan(plan)
-            .totalSessions(plan.getSessionsCount())
-            .remainingSessions(plan.getSessionsCount())
-            .status(SubscriptionStatus.PENDING_PAYMENT)
-            .startDate(LocalDate.now())
-            .endDate(LocalDate.now().plusDays(plan.getValidityDays()))
+        var payment = Payment.builder()
+            .subscription(subscription)
+            .amount(plan.getPrice())
+            .status(PaymentStatus.PAID)
+            .stripeSessionId("CASH_ADMIN_" + UUID.randomUUID())
+            .createdAt(LocalDateTime.now())
             .build();
+        paymentRepository.save(payment);
 
-        var savedSubscription = subscriptionRepository.save(subscription);
-        return subscriptionMapper.toResponse(savedSubscription);
+        eventPublisher.publishEvent(new PaymentSuccessEvent(
+            payment.getId(),
+            payment.getAmount().intValue() * 100,
+            plan.getId(),
+            child.getId()
+        ));
+
+        return subscriptionMapper.toResponse(subscription);
     }
 
     @Override
@@ -103,6 +122,89 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscriptionMapper.toResponse(subscription);
     }
 
+    @Override
+    @Transactional
+    public PaymentResponse initiatePayment(PaymentRequest request)
+        throws StripeException {
+        var child = getChildIfOwner(request.childId());
+        var subscriptionPlan = subscriptionPlanRepository.findById(request.subscriptionPlanId())
+            .orElseThrow(() -> new ResourceNotFoundException("Subscription plan not found"));
+
+        var subscription = createPendingSubscriptionEntity(child, subscriptionPlan);
+
+        var metadata = Map.of(
+            "subscriptionId", subscription.getId().toString()
+        );
+        var stripeResponse =  paymentGateway.createPaymentSession(subscriptionPlan.getPrice().longValue() * 100, "UAH",
+            subscriptionPlan.getName(), metadata);
+
+        var payment = Payment.builder()
+            .subscription(subscription)
+            .amount(subscriptionPlan.getPrice())
+            .createdAt(LocalDateTime.now())
+            .status(PaymentStatus.PENDING)
+            .stripeSessionId(stripeResponse.sessionId())
+            .stripeSessionUrl(stripeResponse.checkoutUrl())
+            .build();
+        paymentRepository.save(payment);
+
+        return stripeResponse;
+    }
+
+    @Override
+    @Transactional
+    public void completePayment(String stripeSessionId) {
+        var payment = paymentRepository.findByStripeSessionId(stripeSessionId)
+            .orElseThrow(() -> new ResourceNotFoundException("Payment not found for session: " + stripeSessionId));
+        if (payment.getStatus() == PaymentStatus.PAID) {
+            log.info("Payment {} already processed. Skipping.", payment.getId());
+            return;
+        }
+        if (payment.getSubscription().getStatus() == SubscriptionStatus.CANCELLED) {
+            log.warn("Payment {} received for cancelled subscription. Ignoring.", payment.getId());
+            return;
+        }
+
+        payment.setStatus(PaymentStatus.PAID);
+        paymentRepository.save(payment);
+
+        var subscription = payment.getSubscription();
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        subscription.setStartDate(LocalDate.now());
+        subscription.setEndDate(
+            LocalDate.now().plusDays(subscription.getSubscriptionPlan().getValidityDays()));
+        subscriptionRepository.save(subscription);
+
+        eventPublisher.publishEvent(
+            new PaymentSuccessEvent(payment.getId(), payment.getAmount().intValue() * 100,
+                subscription.getSubscriptionPlan().getId(), subscription.getChild().getId()));
+    }
+
+    private Subscription createPendingSubscriptionEntity(Child child, SubscriptionPlan plan){
+        if (!plan.isActive()) {
+            throw new IllegalStateException("Subscription plan is not active");
+        }
+
+        if (subscriptionRepository.existsByChildIdAndSubscriptionPlanSectionIdAndStatusIn(
+            child.getId(), plan.getSection().getId(), List.of(
+                SubscriptionStatus.ACTIVE, SubscriptionStatus.PENDING_PAYMENT))) {
+            throw new IllegalStateException(
+                "Child already has an active or pending subscription for this section");
+        }
+
+        var subscription = Subscription.builder()
+            .child(child)
+            .subscriptionPlan(plan)
+            .totalSessions(plan.getSessionsCount())
+            .remainingSessions(plan.getSessionsCount())
+            .status(SubscriptionStatus.PENDING_PAYMENT)
+            .startDate(LocalDate.now())
+            .endDate(LocalDate.now().plusDays(plan.getValidityDays()))
+            .build();
+
+        return subscriptionRepository.save(subscription);
+    }
+
     private Child getChildIfOwner(UUID id) {
         Child child = childRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
@@ -111,5 +213,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             throw new AccessDeniedException("Access to this child's data is denied");
         }
         return child;
+    }
+
+    private Child getChildIfOwnerAdmin(UUID id) {
+        return childRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
     }
 }
