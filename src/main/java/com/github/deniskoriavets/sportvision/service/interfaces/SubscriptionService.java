@@ -20,5 +20,5 @@ public interface SubscriptionService {
 
     PaymentResponse initiatePayment(PaymentRequest request) throws StripeException;
 
-    void completePayment(UUID paymentId);
+    void completePayment(String stripeSessionId);
 }

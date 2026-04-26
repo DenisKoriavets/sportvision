@@ -61,7 +61,7 @@ public class PaymentController {
 
             if (paymentIdStr != null) {
                 log.info("Stripe confirmed payment for internal ID: {}", paymentIdStr);
-                subscriptionService.completePayment(UUID.fromString(paymentIdStr));
+                subscriptionService.completePayment(paymentIdStr);
             }
         }
 

@@ -7,6 +7,7 @@ import com.github.deniskoriavets.sportvision.dto.response.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import com.github.deniskoriavets.sportvision.entity.Payment;
 import com.github.deniskoriavets.sportvision.entity.Subscription;
+import com.github.deniskoriavets.sportvision.entity.SubscriptionPlan;
 import com.github.deniskoriavets.sportvision.entity.enums.PaymentStatus;
 import com.github.deniskoriavets.sportvision.entity.enums.SubscriptionStatus;
 import com.github.deniskoriavets.sportvision.event.PaymentSuccessEvent;
@@ -55,28 +56,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         var plan = subscriptionPlanRepository.findById(subscriptionRequest.planId())
             .orElseThrow(() -> new ResourceNotFoundException("Subscription plan not found"));
 
-        if (!plan.isActive()) {
-            throw new IllegalStateException("Subscription plan is not active");
-        }
-
-        if (subscriptionRepository.existsByChildIdAndSubscriptionPlanSectionIdAndStatusIn(
-            child.getId(), plan.getSection().getId(), List.of(
-                SubscriptionStatus.ACTIVE, SubscriptionStatus.PENDING_PAYMENT))) {
-            throw new IllegalStateException(
-                "Child already has an active or pending subscription for this section");
-        }
-
-        var subscription = Subscription.builder()
-            .child(child)
-            .subscriptionPlan(plan)
-            .totalSessions(plan.getSessionsCount())
-            .remainingSessions(plan.getSessionsCount())
-            .status(SubscriptionStatus.PENDING_PAYMENT)
-            .startDate(LocalDate.now())
-            .endDate(LocalDate.now().plusDays(plan.getValidityDays()))
-            .build();
-
-        var savedSubscription = subscriptionRepository.save(subscription);
+        var savedSubscription = createPendingSubscriptionEntity(child, plan);
         return subscriptionMapper.toResponse(savedSubscription);
     }
 
@@ -128,25 +108,34 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         var subscriptionPlan = subscriptionPlanRepository.findById(request.subscriptionPlanId())
             .orElseThrow(() -> new ResourceNotFoundException("Subscription plan not found"));
 
+        var subscription = createPendingSubscriptionEntity(child, subscriptionPlan);
+
+        var metadata = Map.of(
+            "subscriptionId", subscription.getId().toString()
+        );
+        var stripeResponse =  paymentGateway.createPaymentSession(subscriptionPlan.getPrice().longValue() * 100, "UAH",
+            subscriptionPlan.getName(), metadata);
+
         var payment = Payment.builder()
+            .subscription(subscription)
             .amount(subscriptionPlan.getPrice())
             .createdAt(LocalDateTime.now())
             .status(PaymentStatus.PENDING)
+            .stripeSessionId(stripeResponse.sessionId())
+            .stripeSessionUrl(stripeResponse.checkoutUrl())
             .build();
         paymentRepository.save(payment);
-        var metadata = Map.of("payment_id", payment.getId().toString(), "plan_id",
-            subscriptionPlan.getId().toString(), "child_id", child.getId().toString());
-        return paymentGateway.createPaymentSession(payment.getAmount().longValue() * 100, "UAH",
-            subscriptionPlan.getName(), metadata);
+
+        return stripeResponse;
     }
 
     @Override
     @Transactional
-    public void completePayment(UUID paymentId) {
-        var payment = paymentRepository.findById(paymentId)
-            .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
+    public void completePayment(String stripeSessionId) {
+        var payment = paymentRepository.findByStripeSessionId(stripeSessionId)
+            .orElseThrow(() -> new ResourceNotFoundException("Payment not found for session: " + stripeSessionId));
         if (payment.getStatus() == PaymentStatus.PAID) {
-            log.info("Payment {} already processed. Skipping.", paymentId);
+            log.info("Payment {} already processed. Skipping.", payment.getId());
             return;
         }
 
@@ -163,6 +152,31 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         eventPublisher.publishEvent(
             new PaymentSuccessEvent(payment.getId(), payment.getAmount().intValue() * 100,
                 subscription.getSubscriptionPlan().getId(), subscription.getChild().getId()));
+    }
+
+    private Subscription createPendingSubscriptionEntity(Child child, SubscriptionPlan plan){
+        if (!plan.isActive()) {
+            throw new IllegalStateException("Subscription plan is not active");
+        }
+
+        if (subscriptionRepository.existsByChildIdAndSubscriptionPlanSectionIdAndStatusIn(
+            child.getId(), plan.getSection().getId(), List.of(
+                SubscriptionStatus.ACTIVE, SubscriptionStatus.PENDING_PAYMENT))) {
+            throw new IllegalStateException(
+                "Child already has an active or pending subscription for this section");
+        }
+
+        var subscription = Subscription.builder()
+            .child(child)
+            .subscriptionPlan(plan)
+            .totalSessions(plan.getSessionsCount())
+            .remainingSessions(plan.getSessionsCount())
+            .status(SubscriptionStatus.PENDING_PAYMENT)
+            .startDate(LocalDate.now())
+            .endDate(LocalDate.now().plusDays(plan.getValidityDays()))
+            .build();
+
+        return subscriptionRepository.save(subscription);
     }
 
     private Child getChildIfOwner(UUID id) {
