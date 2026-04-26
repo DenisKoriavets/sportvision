@@ -160,6 +160,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             log.info("Payment {} already processed. Skipping.", payment.getId());
             return;
         }
+        if (payment.getSubscription().getStatus() == SubscriptionStatus.CANCELLED) {
+            log.warn("Payment {} received for cancelled subscription. Ignoring.", payment.getId());
+            return;
+        }
 
         payment.setStatus(PaymentStatus.PAID);
         paymentRepository.save(payment);

@@ -22,12 +22,12 @@ public class PaymentCleanupService {
     private final SubscriptionRepository subscriptionRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(fixedDelay = 30 * 60 * 1000)
     @Transactional
     public void expirePendingPayments() {
         log.info("Starting scheduled cleanup of pending payments...");
-        
-        LocalDateTime limit = LocalDateTime.now().minusHours(24);
+
+        LocalDateTime limit = LocalDateTime.now().minusHours(1);
         var expiredPayments = paymentRepository.findAllByStatusAndCreatedAtBefore(PaymentStatus.PENDING, limit);
 
         for (var payment : expiredPayments) {
