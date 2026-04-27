@@ -34,3 +34,6 @@ jobs:
         with:
           name: test-reports
           path: build/reports/tests/test/
+
+      - name: Verify Dockerfile (Build Image)
+        run: docker build -t sportvision-api:test .
