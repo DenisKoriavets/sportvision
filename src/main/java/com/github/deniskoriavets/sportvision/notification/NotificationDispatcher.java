@@ -1,8 +1,7 @@
-package com.github.deniskoriavets.sportvision.service;
+package com.github.deniskoriavets.sportvision.notification;
 
 import com.github.deniskoriavets.sportvision.dto.NotificationMessage;
 import com.github.deniskoriavets.sportvision.entity.enums.NotificationPreference;
-import com.github.deniskoriavets.sportvision.service.interfaces.NotificationStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

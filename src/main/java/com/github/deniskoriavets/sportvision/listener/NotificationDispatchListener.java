@@ -8,7 +8,7 @@ import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException
 import com.github.deniskoriavets.sportvision.repository.ChildRepository;
 import com.github.deniskoriavets.sportvision.repository.ParentRepository;
 import com.github.deniskoriavets.sportvision.repository.SessionRepository;
-import com.github.deniskoriavets.sportvision.service.NotificationDispatcher;
+import com.github.deniskoriavets.sportvision.notification.NotificationDispatcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;

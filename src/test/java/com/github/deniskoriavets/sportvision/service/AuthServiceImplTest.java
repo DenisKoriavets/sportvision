@@ -11,7 +11,7 @@ import com.github.deniskoriavets.sportvision.repository.ParentRepository;
 import com.github.deniskoriavets.sportvision.repository.RefreshTokenRepository;
 import com.github.deniskoriavets.sportvision.repository.VerificationTokenRepository;
 import com.github.deniskoriavets.sportvision.security.JwtService;
-import com.github.deniskoriavets.sportvision.service.interfaces.EmailService;
+import com.github.deniskoriavets.sportvision.notification.EmailService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

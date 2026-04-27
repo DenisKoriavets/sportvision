@@ -1,4 +1,4 @@
-package com.github.deniskoriavets.sportvision.service.interfaces;
+package com.github.deniskoriavets.sportvision.notification;
 
 import com.github.deniskoriavets.sportvision.dto.NotificationMessage;
 import com.github.deniskoriavets.sportvision.entity.enums.NotificationPreference;
