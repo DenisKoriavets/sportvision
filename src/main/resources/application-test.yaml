@@ -11,19 +11,16 @@ spring:
 application:
   security:
     jwt:
-      secret-key: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
-      expiration: 900000
-      refresh-token:
-        expiration: 604800000
+      secret-key: "dummy_jwt_secret_key_for_testing_purposes_only_needs_to_be_long_enough"
+
 app:
   sendgrid:
-    api-key: "SG.stub_key_for_testing"
+    api-key: "dummy_sendgrid_key"
     from-email: "test@sportvision.com"
-  verification-url: "http://localhost:8080/api/v1/auth/verify"
+  telegram:
+    bot-token: "dummy_telegram_token"
 
 sportvision:
   stripe:
-    secret-key: sk_test_mock_value
-    success-url: "http://localhost:3000/payment/success"
-    cancel-url: "http://localhost:3000/payment/cancel"
-    webhook-secret: whsec_test_mock_value
+    secret-key: "sk_test_dummy"
+    webhook-secret: "whsec_dummy"
