@@ -11,8 +11,7 @@ spring:
 application:
   security:
     jwt:
-      secret-key: "dummy_jwt_secret_key_for_testing_purposes_only_needs_to_be_long_enough"
-
+      secret-key: "ZHVtbXlfc2VjcmV0X2tleV9mb3JfdGVzdGluZ19vbmx5XzEyMzQ1Njc4OTA="
 app:
   sendgrid:
     api-key: "dummy_sendgrid_key"
