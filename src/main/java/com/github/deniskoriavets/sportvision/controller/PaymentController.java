@@ -2,6 +2,7 @@ package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.dto.request.PaymentRequest;
 import com.github.deniskoriavets.sportvision.dto.response.PaymentResponse;
+import com.github.deniskoriavets.sportvision.dto.response.ErrorResponse;
 import com.github.deniskoriavets.sportvision.service.interfaces.SubscriptionService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -9,6 +10,10 @@ import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -38,6 +39,21 @@ public class PaymentController {
     @Operation(summary = "Initiate Stripe checkout session for a subscription")
     @PreAuthorize("hasRole('PARENT')")
     @PostMapping("/checkout")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Checkout session created successfully",
+            content = @Content(schema = @Schema(implementation = PaymentResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid request data",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Access denied - PARENT role required",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Subscription plan or child not found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "409", description = "Child already has active subscription for this section",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "502", description = "Payment service error (Stripe)",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     public ResponseEntity<PaymentResponse> initiateCheckout(
         @Valid @RequestBody PaymentRequest request) throws StripeException {
         return ResponseEntity.ok(subscriptionService.initiatePayment(request));
@@ -45,6 +61,11 @@ public class PaymentController {
 
     @Operation(summary = "Stripe Webhook (Internal use only)")
     @PostMapping("/webhook")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Webhook processed successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid payload or signature",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     public ResponseEntity<String> handleStripeWebhook(
         @RequestBody String payload,
         @RequestHeader("Stripe-Signature") String sigHeader) {

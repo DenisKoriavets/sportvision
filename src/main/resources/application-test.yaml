@@ -11,7 +11,10 @@ spring:
 application:
   security:
     jwt:
-      secret-key: "ZHVtbXlfc2VjcmV0X2tleV9mb3JfdGVzdGluZ19vbmx5XzEyMzQ1Njc4OTA="
+      secret-key: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
+      expiration: 900000
+      refresh-token:
+        expiration: 604800000
 app:
   sendgrid:
     api-key: "dummy_sendgrid_key"
