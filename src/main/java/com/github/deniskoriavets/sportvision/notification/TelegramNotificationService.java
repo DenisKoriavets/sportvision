@@ -29,9 +29,11 @@ public class TelegramNotificationService implements NotificationStrategy {
 
     @Override
     public void send(NotificationMessage message) {
+        if (message.telegramChatId() == null || message.telegramChatId().isBlank()) return;
+
         String telegramApiUrl = "https://api.telegram.org/bot" + botToken + "/sendMessage";
         Map<String, String> requestBody = Map.of(
-            "chat_id", message.recipient(),
+            "chat_id", message.telegramChatId(),
             "text", "<b>" + message.subject() + "</b>\n\n" + message.content(),
             "parse_mode", "HTML"
         );
@@ -41,9 +43,9 @@ public class TelegramNotificationService implements NotificationStrategy {
 
         try {
             restTemplate.postForEntity(telegramApiUrl, requestEntity, String.class);
-            log.info("Telegram notification sent successfully to chat_id: {}", message.recipient());
+            log.info("Telegram notification sent successfully to chat_id: {}", message.telegramChatId());
         } catch (Exception e) {
-            log.error("Failed to send Telegram message to chat_id {}: {}", message.recipient(), e.getMessage());
+            log.error("Failed to send Telegram message to chat_id {}: {}", message.telegramChatId(), e.getMessage());
         }
     }
 }

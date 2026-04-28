@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Нагадування про тренування - SportVision</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f7fa; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .header { background: #ff9800; color: white; padding: 25px; text-align: center; }
+        .content { padding: 30px; line-height: 1.7; }
+        .info { background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⏰ Нагадування про тренування</h1>
+    </div>
+    <div class="content">
+        <p>Привіт, <strong th:text="${parentName}"></strong>!</p>
+        <p>Завтра у вашої дитини <strong th:text="${childName}"></strong> тренування:</p>
+
+        <div class="info">
+            <strong>Секція:</strong> <span th:text="${sectionName}"></span><br>
+            <strong>Група:</strong> <span th:text="${groupName}"></span><br>
+            <strong>Дата:</strong> <span th:text="${date}"></span><br>
+            <strong>Час:</strong> <span th:text="${startTime}"></span> – <span th:text="${endTime}"></span>
+        </div>
+
+        <p>Просимо не запізнюватися.</p>
+    </div>
+</div>
+</body>
+</html>

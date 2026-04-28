@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Підтвердження email - SportVision</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #1e88e5, #42a5f5); color: white; padding: 30px 20px; text-align: center; }
+        .content { padding: 30px 40px; color: #333; line-height: 1.6; }
+        .button { display: inline-block; background: #1e88e5; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 14px; color: #666; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⚽ SportVision</h1>
+        <p>Підтвердження електронної пошти</p>
+    </div>
+
+    <div class="content">
+        <p>Привіт, <strong th:text="${firstName}"></strong>!</p>
+
+        <p>Дякуємо за реєстрацію в SportVision. Щоб активувати акаунт, натисніть кнопку нижче:</p>
+
+        <div style="text-align: center;">
+            <a th:href="${verificationUrl}" class="button">Підтвердити email</a>
+        </div>
+
+        <p>Посилання дійсне протягом 24 годин.</p>
+
+        <p>Якщо ви не реєструвалися — просто ігноруйте цей лист.</p>
+    </div>
+
+    <div class="footer">
+        <p>З повагою,<br>Команда SportVision</p>
+        <p>Це автоматичний лист. Не відповідайте на нього.</p>
+    </div>
+</div>
+</body>
+</html>

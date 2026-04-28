@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Закінчується абонемент - SportVision</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: #ff9800;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .content {
+            padding: 35px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .highlight {
+            background: #fff3e0;
+            padding: 15px;
+            border-left: 5px solid #ff9800;
+            margin: 20px 0;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⚠️ Закінчується абонемент</h1>
+    </div>
+
+    <div class="content">
+        <p>Привіт, <strong th:text="${parentName}"></strong>!</p>
+
+        <p>У вашої дитини <strong th:text="${childName}"></strong> залишилось лише
+            <strong th:text="${remainingSessions}"></strong> занять.</p>
+
+        <div class="highlight">
+            Рекомендуємо завчасно придбати новий абонемент, щоб не пропустити тренування.
+        </div>
+
+        <p>Тепер ви можете оформити новий абонемент у особистому кабінеті.</p>
+    </div>
+
+    <div class="footer">
+        <p>З повагою,<br>Команда SportVision</p>
+    </div>
+</div>
+</body>
+</html>

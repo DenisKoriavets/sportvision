@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Оплата успішна - SportVision</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f7fa; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: #4caf50; color: white; padding: 30px; text-align: center; }
+        .content { padding: 35px; line-height: 1.6; color: #333; }
+        .amount { font-size: 28px; font-weight: bold; color: #4caf50; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 14px; color: #666; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>✅ Оплата успішна!</h1>
+    </div>
+    <div class="content">
+        <p>Привіт, <strong th:text="${firstName}"></strong>!</p>
+        <p>Дякуємо! Ваш платіж на суму <span class="amount" th:text="${amount}"></span> грн успішно проведено.</p>
+
+        <p><strong>Абонемент активовано.</strong></p>
+
+        <p>Дитина: <strong th:text="${childName}"></strong><br>
+            План: <strong th:text="${planName}"></strong></p>
+
+        <p>Тепер ви можете записувати дитину на тренування.</p>
+    </div>
+    <div class="footer">
+        <p>З повагою, команда SportVision</p>
+    </div>
+</div>
+</body>
+</html>

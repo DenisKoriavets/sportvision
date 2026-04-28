@@ -11,10 +11,13 @@ import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import java.io.IOException;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class SendGridEmailService implements EmailService, NotificationStrategy {
 
     private final SendGrid sendGrid;
+    private final TemplateEngine templateEngine;
 
     @Value("${app.sendgrid.from-email}")
     private String fromEmail;
@@ -32,14 +36,25 @@ public class SendGridEmailService implements EmailService, NotificationStrategy 
     @Override
     public void sendVerificationEmail(String to, String token) {
         String fullUrl = verificationUrl + "?token=" + token;
+        Map<String, Object> variables = Map.of(
+            "firstName", "Користувач",
+            "verificationUrl", fullUrl
+        );
+        sendHtmlEmail(to, "Підтвердження реєстрації - SportVision", "verification-email", variables);
+    }
+
+    @Override
+    public void sendHtmlEmail(String to, String subject, String templateName, Map<String, Object> variables) {
+        Context context = new Context();
+        context.setVariables(variables);
+
+        String htmlContent = templateEngine.process(templateName, context);
+
         Email from = new Email(fromEmail);
         Email recipient = new Email(to);
-        String subject = "Please verify your email";
-        Content content = new Content("text/html",
-            "<h1>Welcome!</h1><p>Please click <a href=\"" + fullUrl +
-                "\">here</a> to verify your account.</p>");
-
+        Content content = new Content("text/html", htmlContent);
         Mail mail = new Mail(from, subject, recipient, content);
+
         executeSend(mail, to);
     }
 
@@ -50,15 +65,17 @@ public class SendGridEmailService implements EmailService, NotificationStrategy 
 
     @Override
     public void send(NotificationMessage message) {
+        if (message.templateName() != null && message.templateVariables() != null) {
+            sendHtmlEmail(message.email(), message.subject(), message.templateName(), message.templateVariables());
+            return;
+        }
+
         Email from = new Email(fromEmail);
-        Email recipient = new Email(message.recipient());
-
+        Email recipient = new Email(message.email());
         Content content = new Content("text/html", message.content());
-
         Mail mail = new Mail(from, message.subject(), recipient, content);
-        executeSend(mail, message.recipient());
 
-        log.info("Notification email sent successfully to: {}", message.recipient());
+        executeSend(mail, message.email());
     }
 
     private void executeSend(Mail mail, String recipientEmail) {
@@ -67,15 +84,13 @@ public class SendGridEmailService implements EmailService, NotificationStrategy 
             request.setMethod(Method.POST);
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
-
             Response response = sendGrid.api(request);
 
             if (response.getStatusCode() >= 400) {
-                log.error("SendGrid error: Status {} Body {}", response.getStatusCode(),
-                    response.getBody());
-                throw new EmailSendingException(
-                    "Failed to send email via SendGrid to " + recipientEmail);
+                log.error("SendGrid error: Status {} Body {}", response.getStatusCode(), response.getBody());
+                throw new EmailSendingException("Failed to send email to " + recipientEmail);
             }
+            log.info("Email sent successfully to: {}", recipientEmail);
         } catch (IOException ex) {
             log.error("IO error while sending email to {}", recipientEmail, ex);
             throw new EmailSendingException("Error connecting to email service");
