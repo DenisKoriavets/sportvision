@@ -37,3 +37,6 @@ out/
 .vscode/
 
 .env
+
+# Local Dev Data Seeders
+src/main/java/com/github/deniskoriavets/sportvision/bootstrap/LocalDataInitializer.java

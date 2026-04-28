@@ -42,18 +42,32 @@ public class NotificationDispatchListener {
             var parent = child.getParent();
 
             String subject = "SportVision - Відвідування тренування";
-            String text = String.format(
+
+            String telegramText = String.format(
                 "Відмічено статус відвідування для вашої дитини (%s).\nСекція: %s\nДата: %s\nСтатус: %s",
                 child.getFirstName(), session.getGroup().getName(), session.getDate().toString(),
                 event.status().name());
 
-            var msg =
-                new NotificationMessage(parent.getEmail(), parent.getTelegramChatId(), subject,
-                    text);
+            Map<String, Object> vars = Map.of(
+                "parentName", parent.getFirstName(),
+                "childName", child.getFirstName(),
+                "sectionName", session.getGroup().getName(),
+                "date", session.getDate().toString(),
+                "status", event.status().name()
+            );
+
+            var msg = new NotificationMessage(
+                parent.getEmail(),
+                parent.getTelegramChatId(),
+                subject,
+                telegramText,
+                "attendance-marked",
+                vars
+            );
+
             dispatchSafely(parent.getNotificationPreferences(), msg);
         } catch (Exception e) {
-            log.error("[NOTIFICATION HUB] | Failed to send attendance notification: {}",
-                e.getMessage());
+            log.error("[NOTIFICATION HUB] | Failed to send attendance notification: {}", e.getMessage());
         }
     }
 
@@ -80,7 +94,8 @@ public class NotificationDispatchListener {
                     "childName", child.getFirstName(),
                     "sectionName", session.getGroup().getName(),
                     "date", session.getDate().toString(),
-                    "time", session.getStartTime().toString()
+                    "time", session.getStartTime().toString(),
+                    "reason", event.reason() != null ? event.reason() : ""
                 );
 
                 var msg =
@@ -108,6 +123,7 @@ public class NotificationDispatchListener {
                 event.amount(), child.getFirstName());
             Map<String, Object> vars = Map.of(
                 "firstName", parent.getFirstName(),
+                "childName", child.getFirstName(),
                 "amount", event.amount()
             );
 
@@ -131,17 +147,28 @@ public class NotificationDispatchListener {
                 .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
 
             String subject = "SportVision - Платіж скасовано";
-            String text = String.format(
+
+            String telegramText = String.format(
                 "Ваш платіж для дитини %s не був завершений вчасно і його скасовано системою.",
                 child.getFirstName());
 
-            var msg =
-                new NotificationMessage(parent.getEmail(), parent.getTelegramChatId(), subject,
-                    text);
+            Map<String, Object> vars = Map.of(
+                "parentName", parent.getFirstName(),
+                "childName", child.getFirstName()
+            );
+
+            var msg = new NotificationMessage(
+                parent.getEmail(),
+                parent.getTelegramChatId(),
+                subject,
+                telegramText,
+                "payment-expired",
+                vars
+            );
+
             dispatchSafely(parent.getNotificationPreferences(), msg);
         } catch (Exception e) {
-            log.error("[NOTIFICATION HUB] | Failed to send payment expired notification: {}",
-                e.getMessage());
+            log.error("[NOTIFICATION HUB] | Failed to send payment expired notification: {}", e.getMessage());
         }
     }
 
