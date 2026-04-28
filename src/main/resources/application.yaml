@@ -7,6 +7,9 @@ spring:
     active: dev
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+  thymeleaf:
+    prefix: classpath:/email-templates/
+    suffix: .html
 
 springdoc:
   api-docs:
