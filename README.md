@@ -259,9 +259,9 @@ docker compose up -d
 
 | Метод | Endpoint | Опис | Auth |
 |---|---|---|---|
-| `POST` | `/` | Додати слот розкладу | ADMIN |
+| `POST` | `/` | Додати слот розкладу | ADMIN / COACH |
 | `GET` | `/group/{groupId}` | Розклад групи | Authenticated |
-| `DELETE` | `/{id}` | Видалити слот | ADMIN |
+| `DELETE` | `/{id}` | Видалити слот | ADMIN / COACH |
 
 ### 🎯 Заняття — `/api/v1/sessions`
 
@@ -271,6 +271,7 @@ docker compose up -d
 | `POST` | `/` | Створити разове заняття | ADMIN / COACH |
 | `PUT` | `/{id}/cancel` | Скасувати заняття | ADMIN / COACH |
 | `POST` | `/{id}/attendance` | Відмітити відвідування (масово) | COACH |
+| `PUT` | `/{sessionId}/attendance/{childId}` | Виправити відмітку (тільки для SCHEDULED) | COACH / ADMIN |
 | `GET` | `/group/{groupId}` | Заняття групи за датами | Authenticated |
 | `GET` | `/` | Пошук занять з фільтрами | Authenticated |
 
@@ -288,6 +289,8 @@ docker compose up -d
 | Метод | Endpoint | Опис | Auth |
 |---|---|---|---|
 | `POST` | `/checkout` | Створити Stripe Checkout Session | PARENT |
+| `GET` | `/` | Список своїх платежів | PARENT |
+| `GET` | `/{id}` | Деталі платежу (тільки свої) | PARENT |
 | `POST` | `/webhook` | Stripe Webhook з верифікацією підпису | Public (Stripe) |
 
 ### 📊 Тарифні плани — `/api/v1/subscription-plans`
@@ -306,6 +309,7 @@ docker compose up -d
 |---|---|---|---|
 | `GET` | `/` | Список тренерів | Authenticated |
 | `POST` | `/{id}/assign` | Призначити роль COACH | ADMIN |
+| `DELETE` | `/{id}/revoke` | Відкликати роль COACH | ADMIN |
 | `GET` | `/{id}/groups` | Групи тренера | COACH / ADMIN |
 
 ### ⚙️ Адмін — `/api/v1/admin`
@@ -313,6 +317,11 @@ docker compose up -d
 | Метод | Endpoint | Опис | Auth |
 |---|---|---|---|
 | `GET` | `/stats` | Загальна статистика системи | ADMIN |
+| `GET` | `/children` | Всі діти в системі (з фільтрами) | ADMIN |
+| `GET` | `/children/{id}` | Дитина по id (без ownership перевірки) | ADMIN |
+| `DELETE` | `/children/{id}` | Видалити будь-яку дитину (soft delete) | ADMIN |
+| `GET` | `/subscriptions` | Всі абонементи (фільтр по статусу) | ADMIN |
+| `PUT` | `/subscriptions/{id}/activate` | Ручна активація абонементу | ADMIN |
 
 ---
 
@@ -351,7 +360,7 @@ Swagger UI підтримує JWT авторизацію — натисніть 
 | Шар | Тести |
 |---|---|
 | Integration (Controllers) | Auth, Child, Group, Enrollment, Parent, Subscription, Payment, Attendance |
-| Unit (Services) | Auth, Child, Group, Session, Enrollment, Subscription, SubscriptionPlan, PaymentCleanup |
+| Unit (Services) | Auth, Child (+ admin ops), Group, Session, Enrollment, Subscription (+ payment history, admin activate), SubscriptionPlan, PaymentCleanup, Parent (coach revoke) |
 | Unit (Listeners) | SubscriptionDeduction, SessionCancellation |
 | Unit (Schedulers) | NotificationScheduler |
 | Repository | Child (soft delete), Subscription (optimistic locking) |
