@@ -132,4 +132,30 @@ public class ChildServiceImpl implements ChildService {
             .map(childMapper::toResponse)
             .toList();
     }
+
+    // ── Admin-only implementations ───────────────────────────────────────────
+
+    @Override
+    public ChildResponse getChildByIdAdmin(UUID id) {
+        // No ownership check — caller must be ADMIN (enforced at controller via @PreAuthorize)
+        return childMapper.toResponse(
+            childRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Child not found"))
+        );
+    }
+
+    @Override
+    @Transactional
+    public void deleteChildAdmin(UUID id) {
+        Child child = childRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
+        childRepository.delete(child);
+    }
+
+    @Override
+    public Page<ChildResponse> getAllChildrenAdmin(ChildSearchCriteria criteria, Pageable pageable) {
+        // Admin sees everyone — no parentId restriction injected
+        return childRepository.findAll(ChildSpecifications.build(criteria), pageable)
+            .map(childMapper::toResponse);
+    }
 }

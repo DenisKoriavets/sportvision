@@ -60,7 +60,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
     void shouldRegisterParentSuccessfully() throws Exception {
         var registrationEmail = "new-parent@ukma.edu.ua";
 
-        var request = new RegisterRequest(registrationEmail, "StrongPassword123!", "Denis", "Koriavets");
+        var request =
+            new RegisterRequest(registrationEmail, "StrongPassword123!", "Denis", "Koriavets");
 
         mockMvc.perform(post("/api/v1/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -154,7 +155,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(post("/api/v1/auth/refresh")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new RefreshTokenRequest(oldRefreshTokenValue))))
+                .content(
+                    objectMapper.writeValueAsString(new RefreshTokenRequest(oldRefreshTokenValue))))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.accessToken").exists());
     }
@@ -162,11 +164,43 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("should logout and remove refresh token")
     void shouldLogoutSuccessfully() throws Exception {
-        String tokenToDelete = UUID.randomUUID().toString();
+        Parent parent = parentRepository.save(Parent.builder()
+            .email("logout@ukma.edu.ua")
+            .firstName("Logout")
+            .lastName("Test")
+            .passwordHash(passwordEncoder.encode("StrongPassword123!"))
+            .role(Role.PARENT)
+            .isEmailVerified(true)
+            .isActive(true)
+            .build());
+
+        String refreshTokenValue = UUID.randomUUID().toString();
+        refreshTokenRepository.save(RefreshToken.builder()
+            .token(refreshTokenValue)
+            .parent(parent)
+            .expiryDate(Instant.now().plusSeconds(3600))
+            .revoked(false)
+            .build());
+
+        var loginResponse = mockMvc.perform(post("/api/v1/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                    new LoginRequest("logout@ukma.edu.ua", "StrongPassword123!"))))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String accessToken = objectMapper
+            .readTree(loginResponse.getResponse().getContentAsString())
+            .get("accessToken")
+            .asText();
 
         mockMvc.perform(post("/api/v1/auth/logout")
+                .header("Authorization", "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new RefreshTokenRequest(tokenToDelete))))
+                .content(objectMapper.writeValueAsString(
+                    new RefreshTokenRequest(refreshTokenValue))))
             .andExpect(status().isNoContent());
+
+        assertThat(refreshTokenRepository.findByToken(refreshTokenValue)).isEmpty();
     }
 }

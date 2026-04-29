@@ -31,6 +31,7 @@ public class SubscriptionPlanController {
     private final SubscriptionPlanService subscriptionPlanService;
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get all available subscription plans")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "List of subscription plans returned",
@@ -45,6 +46,7 @@ public class SubscriptionPlanController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get subscription plan by ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Subscription plan found",

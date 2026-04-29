@@ -28,7 +28,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     @Operation(summary = "Create a new schedule slot")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Schedule created successfully",
@@ -46,6 +46,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/group/{groupId}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get full schedule for a group")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Schedule for the group returned",
@@ -58,7 +59,7 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COACH')")
     @Operation(summary = "Delete a schedule slot")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Schedule deleted successfully"),

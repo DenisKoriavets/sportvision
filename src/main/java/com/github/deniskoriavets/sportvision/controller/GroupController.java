@@ -35,6 +35,7 @@ public class GroupController {
     private final ChildService childService;
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get groups with filtering and pagination")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "List of groups returned",
@@ -65,6 +66,7 @@ public class GroupController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get group by ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Group found",

@@ -32,6 +32,7 @@ public class SectionController {
     private final SectionService sectionService;
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get sections with filtering and pagination")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "List of sections returned",
@@ -62,6 +63,7 @@ public class SectionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get section by ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Section found",

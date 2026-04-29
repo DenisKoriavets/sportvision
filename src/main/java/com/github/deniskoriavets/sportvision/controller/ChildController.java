@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/children")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('PARENT')")
 @Tag(name = "Children", description = "Managing children linked to a parent account")
 public class ChildController {
 
@@ -101,14 +103,15 @@ public class ChildController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('PARENT', 'COACH', 'ADMIN')")
     @Operation(summary = "Search children by name, group or parent")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Search results returned"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<Page<ChildResponse>> searchChildren(
-        ChildSearchCriteria criteria,
-        Pageable pageable) {
+        @ParameterObject ChildSearchCriteria criteria,
+        @ParameterObject Pageable pageable) {
         return ResponseEntity.ok(childService.searchChildren(criteria, pageable));
     }
 

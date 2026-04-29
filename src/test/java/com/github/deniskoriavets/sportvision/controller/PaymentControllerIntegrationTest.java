@@ -1,6 +1,8 @@
 package com.github.deniskoriavets.sportvision.controller;
 
 import com.github.deniskoriavets.sportvision.BaseIntegrationTest;
+import com.github.deniskoriavets.sportvision.entity.Parent;
+import com.github.deniskoriavets.sportvision.entity.enums.Role;
 import com.github.deniskoriavets.sportvision.service.interfaces.SubscriptionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +14,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class PaymentControllerIntegrationTest extends BaseIntegrationTest {
@@ -53,5 +57,25 @@ class PaymentControllerIntegrationTest extends BaseIntegrationTest {
             .andExpect(status().isBadRequest());
 
         verify(subscriptionService, never()).completePayment(org.mockito.ArgumentMatchers.anyString());
+    }
+
+    @Test
+    @DisplayName("GET /payments returns 200 and only current parent's payments")
+    void getMyPayments_Returns200_ForAuthenticatedParent() throws Exception {
+        String rawPassword = "StrongPassword123!";
+        createParentWithPassword("payment-viewer@ukma.edu.ua", Role.PARENT, rawPassword);
+        String accessToken = loginAndGetToken("payment-viewer@ukma.edu.ua", rawPassword);
+
+        mockMvc.perform(get("/api/v1/payments")
+                .header("Authorization", "Bearer " + accessToken))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    @DisplayName("GET /payments returns 403 for unauthenticated request")
+    void getMyPayments_Returns403_WhenNotAuthenticated() throws Exception {
+        mockMvc.perform(get("/api/v1/payments"))
+            .andExpect(status().isForbidden());
     }
 }

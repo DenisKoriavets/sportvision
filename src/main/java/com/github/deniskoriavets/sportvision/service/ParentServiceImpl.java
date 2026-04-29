@@ -80,4 +80,17 @@ public class ParentServiceImpl implements ParentService {
         parent.setRole(Role.COACH);
         parentRepository.save(parent);
     }
+
+    @Override
+    public void revokeCoachRole(UUID id) {
+        Parent parent = parentRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Parent not found"));
+
+        if (parent.getRole() != Role.COACH) {
+            throw new IllegalStateException("Parent is not a coach, cannot revoke coach role");
+        }
+
+        parent.setRole(Role.PARENT);
+        parentRepository.save(parent);
+    }
 }

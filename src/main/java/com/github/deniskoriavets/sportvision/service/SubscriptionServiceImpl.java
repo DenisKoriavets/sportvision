@@ -21,6 +21,8 @@ import com.github.deniskoriavets.sportvision.security.SecurityFacade;
 import com.github.deniskoriavets.sportvision.service.interfaces.PaymentGateway;
 import com.github.deniskoriavets.sportvision.service.interfaces.SubscriptionService;
 import com.stripe.exception.StripeException;
+import com.github.deniskoriavets.sportvision.entity.Payment;
+import com.github.deniskoriavets.sportvision.dto.response.PaymentDetailResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -219,4 +221,62 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return childRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PaymentDetailResponse> getMyPayments() {
+        UUID currentParentId = securityFacade.getCurrentUserId();
+        return paymentRepository.findAllByParentId(currentParentId).stream()
+            .map(this::toPaymentDetailResponse)
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaymentDetailResponse getPaymentById(UUID paymentId) {
+        UUID currentParentId = securityFacade.getCurrentUserId();
+        Payment payment = paymentRepository.findByIdAndParentId(paymentId, currentParentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
+        return toPaymentDetailResponse(payment);
+    }
+
+    private PaymentDetailResponse toPaymentDetailResponse(Payment payment) {
+        return new PaymentDetailResponse(
+            payment.getId(),
+            payment.getSubscription().getId(),
+            payment.getAmount(),
+            payment.getStatus(),
+            payment.getStripeSessionUrl(),
+            payment.getCreatedAt()
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SubscriptionResponse> getAllSubscriptionsAdmin(List<SubscriptionStatus> statuses) {
+        List<Subscription> result = (statuses == null || statuses.isEmpty())
+            ? subscriptionRepository.findAll()
+            : subscriptionRepository.findAllByStatusIn(statuses);
+
+        return result.stream()
+            .map(subscriptionMapper::toResponse)
+            .toList();
+    }
+
+    @Override
+    @Transactional
+    public SubscriptionResponse activateSubscriptionAdmin(UUID id) {
+        Subscription subscription = subscriptionRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Subscription not found"));
+
+        if (subscription.getStatus() != SubscriptionStatus.PENDING_PAYMENT) {
+            throw new IllegalStateException(
+                "Only PENDING_PAYMENT subscriptions can be manually activated, current: "
+                    + subscription.getStatus());
+        }
+
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        return subscriptionMapper.toResponse(subscriptionRepository.save(subscription));
+    }
+
 }

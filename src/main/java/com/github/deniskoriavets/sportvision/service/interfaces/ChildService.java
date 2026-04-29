@@ -28,4 +28,10 @@ public interface ChildService {
     List<SubscriptionResponse> getChildSubscriptions(UUID childId);
 
     List<ChildResponse> getChildrenByGroupId(UUID groupId);
+
+    ChildResponse getChildByIdAdmin(UUID id);
+
+    void deleteChildAdmin(UUID id);
+
+    Page<ChildResponse> getAllChildrenAdmin(ChildSearchCriteria criteria, Pageable pageable);
 }

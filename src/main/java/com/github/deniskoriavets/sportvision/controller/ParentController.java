@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/parents")
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")
 @Tag(name = "Parents", description = "Managing parent profile")
 public class ParentController {
 

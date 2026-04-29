@@ -18,6 +18,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.github.deniskoriavets.sportvision.dto.response.PaymentDetailResponse;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -91,5 +94,30 @@ public class PaymentController {
         }
 
         return ResponseEntity.ok("Success");
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('PARENT')")
+    @Operation(summary = "Get all payments for the current parent")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Payment list returned",
+            content = @Content(schema = @Schema(implementation = PaymentDetailResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    public ResponseEntity<List<PaymentDetailResponse>> getMyPayments() {
+        return ResponseEntity.ok(subscriptionService.getMyPayments());
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('PARENT')")
+    @Operation(summary = "Get a specific payment by id (ownership enforced)")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Payment found",
+            content = @Content(schema = @Schema(implementation = PaymentDetailResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Payment not found or not yours",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<PaymentDetailResponse> getPaymentById(@PathVariable UUID id) {
+        return ResponseEntity.ok(subscriptionService.getPaymentById(id));
     }
 }

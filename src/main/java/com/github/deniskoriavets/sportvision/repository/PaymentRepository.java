@@ -18,4 +18,23 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
     @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.status = :status")
     BigDecimal sumAmountByStatus(@Param("status") PaymentStatus status);
+
+    @Query("""
+        SELECT p FROM Payment p
+        JOIN p.subscription s
+        JOIN s.child c
+        WHERE c.parent.id = :parentId
+        ORDER BY p.createdAt DESC
+        """)
+    List<Payment> findAllByParentId(@Param("parentId") UUID parentId);
+
+    @Query("""
+        SELECT p FROM Payment p
+        JOIN p.subscription s
+        JOIN s.child c
+        WHERE p.id = :paymentId AND c.parent.id = :parentId
+        """)
+    Optional<Payment> findByIdAndParentId(
+        @Param("paymentId") UUID paymentId,
+        @Param("parentId") UUID parentId);
 }

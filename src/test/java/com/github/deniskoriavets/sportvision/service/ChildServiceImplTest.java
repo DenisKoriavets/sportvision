@@ -4,6 +4,7 @@ import com.github.deniskoriavets.sportvision.dto.request.ChildRequest;
 import com.github.deniskoriavets.sportvision.dto.response.ChildResponse;
 import com.github.deniskoriavets.sportvision.entity.Child;
 import com.github.deniskoriavets.sportvision.entity.Parent;
+import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.AttendanceMapper;
 import com.github.deniskoriavets.sportvision.mapper.ChildMapper;
 import com.github.deniskoriavets.sportvision.mapper.SubscriptionMapper;
@@ -23,6 +24,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -124,5 +127,44 @@ class ChildServiceImplTest {
 
         assertThrows(AccessDeniedException.class,
             () -> childService.updateChild(childId, new ChildRequest("A", "B", LocalDate.now().minusYears(5))));
+    }
+
+    @Test
+    @DisplayName("Admin can get any child without ownership check")
+    void getChildByIdAdmin_ReturnsChild_WithoutOwnershipCheck() {
+        UUID childId = UUID.randomUUID();
+        Child child = Child.builder().id(childId).firstName("Max").build();
+
+        when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+        when(childMapper.toResponse(child)).thenReturn(new ChildResponse(childId, "Max", null, null, null));
+
+        ChildResponse result = childService.getChildByIdAdmin(childId);
+
+        assertThat(result.id()).isEqualTo(childId);
+        verifyNoInteractions(securityFacade);
+    }
+
+    @Test
+    @DisplayName("Admin deleteChildAdmin removes child regardless of parent")
+    void deleteChildAdmin_DeletesChild_WithoutOwnershipCheck() {
+        UUID childId = UUID.randomUUID();
+        Child child = Child.builder().id(childId).build();
+
+        when(childRepository.findById(childId)).thenReturn(Optional.of(child));
+
+        childService.deleteChildAdmin(childId);
+
+        verify(childRepository).delete(child);
+        verifyNoInteractions(securityFacade);
+    }
+
+    @Test
+    @DisplayName("Admin deleteChildAdmin throws when child not found")
+    void deleteChildAdmin_Throws_WhenNotFound() {
+        UUID childId = UUID.randomUUID();
+        when(childRepository.findById(childId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> childService.deleteChildAdmin(childId))
+            .isInstanceOf(ResourceNotFoundException.class);
     }
 }

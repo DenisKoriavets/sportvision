@@ -2,6 +2,7 @@ package com.github.deniskoriavets.sportvision.service;
 
 import com.github.deniskoriavets.sportvision.dto.request.PaymentRequest;
 import com.github.deniskoriavets.sportvision.dto.request.SubscriptionRequest;
+import com.github.deniskoriavets.sportvision.dto.response.PaymentDetailResponse;
 import com.github.deniskoriavets.sportvision.dto.response.PaymentResponse;
 import com.github.deniskoriavets.sportvision.dto.response.SubscriptionResponse;
 import com.github.deniskoriavets.sportvision.entity.*;
@@ -16,6 +17,7 @@ import com.github.deniskoriavets.sportvision.repository.SubscriptionRepository;
 import com.github.deniskoriavets.sportvision.security.SecurityFacade;
 import com.github.deniskoriavets.sportvision.service.interfaces.PaymentGateway;
 import com.stripe.exception.StripeException;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +30,8 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -228,5 +232,61 @@ class SubscriptionServiceImplTest {
         verify(paymentRepository).save(payment);
         verify(subscriptionRepository).save(subscription);
         verify(eventPublisher).publishEvent(any(PaymentSuccessEvent.class));
+    }
+
+    @Test
+    @DisplayName("getMyPayments returns only payments of current parent")
+    void getMyPayments_ReturnsOnlyCurrentParentPayments() {
+        UUID parentId = UUID.randomUUID();
+
+        Subscription subscription = Subscription.builder()
+            .id(UUID.randomUUID())
+            .build();
+
+        Payment payment = Payment.builder()
+            .id(UUID.randomUUID())
+            .amount(BigDecimal.valueOf(500))
+            .status(PaymentStatus.PAID)
+            .subscription(subscription)
+            .build();
+
+        when(securityFacade.getCurrentUserId()).thenReturn(parentId);
+        when(paymentRepository.findAllByParentId(parentId)).thenReturn(List.of(payment));
+
+        List<PaymentDetailResponse> result = subscriptionService.getMyPayments();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).subscriptionId()).isEqualTo(subscription.getId());
+        verify(paymentRepository).findAllByParentId(parentId);
+    }
+
+    @Test
+    @DisplayName("activateSubscriptionAdmin activates PENDING_PAYMENT subscription")
+    void activateSubscriptionAdmin_Activates_WhenPendingPayment() {
+        UUID id = UUID.randomUUID();
+        Subscription sub = Subscription.builder()
+            .id(id).status(SubscriptionStatus.PENDING_PAYMENT).build();
+
+        when(subscriptionRepository.findById(id)).thenReturn(Optional.of(sub));
+        when(subscriptionRepository.save(sub)).thenReturn(sub);
+        when(subscriptionMapper.toResponse(sub)).thenReturn(mock(SubscriptionResponse.class));
+
+        subscriptionService.activateSubscriptionAdmin(id);
+
+        assertThat(sub.getStatus()).isEqualTo(SubscriptionStatus.ACTIVE);
+    }
+
+    @Test
+    @DisplayName("activateSubscriptionAdmin throws when subscription is not PENDING_PAYMENT")
+    void activateSubscriptionAdmin_Throws_WhenNotPendingPayment() {
+        UUID id = UUID.randomUUID();
+        Subscription sub = Subscription.builder()
+            .id(id).status(SubscriptionStatus.EXPIRED).build();
+
+        when(subscriptionRepository.findById(id)).thenReturn(Optional.of(sub));
+
+        assertThatThrownBy(() -> subscriptionService.activateSubscriptionAdmin(id))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("EXPIRED");
     }
 }

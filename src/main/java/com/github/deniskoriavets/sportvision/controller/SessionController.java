@@ -19,6 +19,8 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import com.github.deniskoriavets.sportvision.dto.response.AttendanceResponse;
+import com.github.deniskoriavets.sportvision.entity.enums.AttendanceStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -88,6 +90,7 @@ public class SessionController {
     }
 
     @GetMapping("/group/{groupId}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get sessions for a group within a date range")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "List of sessions returned",
@@ -123,6 +126,7 @@ public class SessionController {
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Search and filter sessions with pagination")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Sessions found",
@@ -133,5 +137,24 @@ public class SessionController {
         SessionSearchCriteria criteria,
         Pageable pageable) {
         return ResponseEntity.ok(sessionService.searchSessions(criteria, pageable));
+    }
+
+    @PutMapping("/{sessionId}/attendance/{childId}")
+    @PreAuthorize("hasAnyRole('COACH', 'ADMIN')")
+    @Operation(summary = "Update attendance status for a specific child in a session")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Attendance updated",
+            content = @Content(schema = @Schema(implementation = AttendanceResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Session is not in SCHEDULED status",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Session, child or attendance record not found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<AttendanceResponse> updateAttendance(
+        @PathVariable UUID sessionId,
+        @PathVariable UUID childId,
+        @RequestParam AttendanceStatus status) {
+        return ResponseEntity.ok(
+            attendanceService.updateAttendanceStatus(sessionId, childId, status));
     }
 }

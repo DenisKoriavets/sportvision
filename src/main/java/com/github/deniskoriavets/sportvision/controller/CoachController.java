@@ -73,4 +73,21 @@ public class CoachController {
     public ResponseEntity<List<GroupResponse>> getCoachGroups(@PathVariable UUID id) {
         return ResponseEntity.ok(groupService.getGroupsByCoachId(id));
     }
+
+    @DeleteMapping("/{id}/revoke")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Revoke COACH role, downgrade back to PARENT")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Coach role revoked successfully"),
+        @ApiResponse(responseCode = "400", description = "Parent is not a coach",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "403", description = "Access denied - ADMIN role required",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Parent not found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<Void> revokeCoach(@PathVariable UUID id) {
+        parentService.revokeCoachRole(id);
+        return ResponseEntity.noContent().build();
+    }
 }
