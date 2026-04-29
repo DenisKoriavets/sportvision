@@ -44,30 +44,29 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void register(RegisterRequest request) {
-        try {
-            Parent parent = Parent.builder()
-                .firstName(request.firstName())
-                .lastName(request.lastName())
-                .email(request.email())
-                .passwordHash(passwordEncoder.encode(request.password()))
-                .role(Role.PARENT)
-                .build();
-
-            Parent savedParent = parentRepository.save(parent);
-
-            String token = UUID.randomUUID().toString();
-            VerificationToken verificationToken = VerificationToken.builder()
-                .token(token)
-                .parent(savedParent)
-                .expiryDate(LocalDateTime.now().plusHours(24))
-                .build();
-
-            verificationTokenRepository.save(verificationToken);
-            emailService.sendVerificationEmail(savedParent.getEmail(), token);
-
-        } catch (DataIntegrityViolationException e) {
+        if (parentRepository.existsByEmail(request.email())) {
             throw new EmailAlreadyTakenException("Email " + request.email() + " is already registered");
         }
+
+        Parent parent = Parent.builder()
+            .firstName(request.firstName())
+            .lastName(request.lastName())
+            .email(request.email())
+            .passwordHash(passwordEncoder.encode(request.password()))
+            .role(Role.PARENT)
+            .build();
+
+        Parent savedParent = parentRepository.save(parent);
+
+        String token = UUID.randomUUID().toString();
+        VerificationToken verificationToken = VerificationToken.builder()
+            .token(token)
+            .parent(savedParent)
+            .expiryDate(LocalDateTime.now().plusHours(24))
+            .build();
+        verificationTokenRepository.save(verificationToken);
+
+        emailService.sendVerificationEmail(savedParent.getEmail(), token);
     }
 
     @Override

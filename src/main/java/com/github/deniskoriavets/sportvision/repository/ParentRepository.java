@@ -10,6 +10,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 
 public interface ParentRepository extends JpaRepository<Parent, UUID> {
-  Optional<Parent> findByEmail(String email);
-  Page<Parent> findAllByRole(Role role, Pageable pageable);
+    Optional<Parent> findByEmail(String email);
+
+    Page<Parent> findAllByRole(Role role, Pageable pageable);
+
+    boolean existsByEmail(String email);
 }
