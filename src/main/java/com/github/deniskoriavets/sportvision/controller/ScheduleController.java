@@ -36,7 +36,7 @@ public class ScheduleController {
         @ApiResponse(responseCode = "400", description = "Validation error",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "403", description = "Access denied - ADMIN role required",
+        @ApiResponse(responseCode = "403", description = "Access denied - ADMIN or COACH role required",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "Group not found",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -64,7 +64,7 @@ public class ScheduleController {
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Schedule deleted successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "403", description = "Access denied - ADMIN role required",
+        @ApiResponse(responseCode = "403", description = "Access denied - ADMIN or COACH role required",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "Schedule not found",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

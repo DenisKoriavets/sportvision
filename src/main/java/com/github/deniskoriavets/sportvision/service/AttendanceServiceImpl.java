@@ -4,6 +4,7 @@ import com.github.deniskoriavets.sportvision.dto.request.BulkAttendanceRequest;
 import com.github.deniskoriavets.sportvision.dto.response.AttendanceResponse;
 import com.github.deniskoriavets.sportvision.entity.enums.AttendanceStatus;
 import com.github.deniskoriavets.sportvision.entity.enums.SessionStatus;
+import com.github.deniskoriavets.sportvision.exception.ResourceNotFoundException;
 import com.github.deniskoriavets.sportvision.mapper.AttendanceMapper;
 import com.github.deniskoriavets.sportvision.entity.Attendance;
 import com.github.deniskoriavets.sportvision.event.AttendanceMarkedEvent;
@@ -36,7 +37,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     public void markBulkAttendance(BulkAttendanceRequest request) {
         var currentUser = securityFacade.getCurrentUser();
         var session = sessionRepository.findById(request.sessionId())
-            .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
 
         for (var attendance : request.attendances()) {
             if (attendanceRepository.existsBySessionIdAndChildId(session.getId(), attendance.childId())) {
@@ -44,7 +45,7 @@ public class AttendanceServiceImpl implements AttendanceService {
             }
 
             var child = childRepository.findById(attendance.childId())
-                .orElseThrow(() -> new IllegalArgumentException("Child not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
 
             var attendanceEntity = Attendance.builder()
                 .child(child)
@@ -63,7 +64,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Transactional
     public AttendanceResponse updateAttendanceStatus(UUID sessionId, UUID childId, AttendanceStatus newStatus) {
         var session = sessionRepository.findById(sessionId)
-            .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
 
         if (session.getStatus() != SessionStatus.SCHEDULED) {
             throw new IllegalStateException(
@@ -71,7 +72,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
 
         var attendance = attendanceRepository.findBySessionIdAndChildId(sessionId, childId)
-            .orElseThrow(() -> new IllegalArgumentException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Attendance record not found for this session and child"));
 
         attendance.setStatus(newStatus);

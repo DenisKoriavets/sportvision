@@ -30,8 +30,8 @@ public class AuditAspect {
             result);
     }
 
-    @Pointcut("execution(* *..createSubscription(..)) || " +
-        "execution(* *..markAttendance(..)) || " +
-        "execution(* *..createPayment(..))")
+    @Pointcut("execution(* *..buySubscriptionManual(..)) || " +
+        "execution(* *..markBulkAttendance(..)) || " +
+        "execution(* *..initiatePayment(..))")
     public void auditMethods() {}
 }
