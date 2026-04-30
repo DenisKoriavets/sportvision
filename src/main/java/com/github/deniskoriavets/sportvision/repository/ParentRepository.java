@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 public interface ParentRepository extends JpaRepository<Parent, UUID> {
@@ -15,4 +16,11 @@ public interface ParentRepository extends JpaRepository<Parent, UUID> {
     Page<Parent> findAllByRole(Role role, Pageable pageable);
 
     boolean existsByEmail(String email);
+
+    @Query("""
+    SELECT p FROM Parent p
+    JOIN FETCH p.notificationPreferences
+    WHERE p.id = :id
+    """)
+    Optional<Parent> findByIdWithPreferences(UUID id);
 }

@@ -35,9 +35,9 @@ public class NotificationDispatchListener {
             event.childId(), event.sessionId(), event.status());
 
         try {
-            var session = sessionRepository.findById(event.sessionId())
+            var session = sessionRepository.findByIdWithGroup(event.sessionId())
                 .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
-            var child = childRepository.findById(event.childId())
+            var child = childRepository.findByIdWithParentAndPreferences(event.childId())
                 .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
             var parent = child.getParent();
 
@@ -75,9 +75,9 @@ public class NotificationDispatchListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSessionCancelled(SessionCancelledEvent event) {
         try {
-            var session = sessionRepository.findById(event.sessionId())
+            var session = sessionRepository.findByIdWithGroup(event.sessionId())
                 .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
-            var children = childRepository.findAllByGroupId(session.getGroup().getId());
+            var children = childRepository.findAllByGroupIdWithParentAndPreferences(session.getGroup().getId());
 
             for (var child : children) {
                 var parent = child.getParent();
@@ -113,27 +113,30 @@ public class NotificationDispatchListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePaymentSuccess(PaymentSuccessEvent event) {
         try {
-            var child = childRepository.findById(event.childId())
+            var child = childRepository.findByIdWithParentAndPreferences(event.childId())
                 .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
+
             var parent = child.getParent();
             String subject = "SportVision - Успішна оплата абонемента!";
 
             String telegramText = String.format(
                 "Оплата в розмірі %d UAH за абонемент для %s успішно пройшла. Дякуємо!",
-                event.amount(), child.getFirstName());
+                event.amount() / 100, child.getFirstName());
+
             Map<String, Object> vars = Map.of(
                 "firstName", parent.getFirstName(),
                 "childName", child.getFirstName(),
-                "amount", event.amount()
+                "amount", event.amount() / 100
             );
 
             var msg =
                 new NotificationMessage(parent.getEmail(), parent.getTelegramChatId(), subject,
                     telegramText, "payment-success", vars);
             dispatchSafely(parent.getNotificationPreferences(), msg);
+
+            log.info("[NOTIFICATION HUB] | Payment success notification sent for child: {}", child.getFirstName());
         } catch (Exception e) {
-            log.error("[NOTIFICATION HUB] | Failed to send payment success notification: {}",
-                e.getMessage());
+            log.error("[NOTIFICATION HUB] | Failed to send payment success notification: {}", e.getMessage(), e);
         }
     }
 
@@ -141,7 +144,7 @@ public class NotificationDispatchListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePaymentExpired(PaymentExpiredEvent event) {
         try {
-            var parent = parentRepository.findById(event.parentId())
+            var parent = parentRepository.findByIdWithPreferences(event.parentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Parent not found"));
             var child = childRepository.findById(event.childId())
                 .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
@@ -176,7 +179,7 @@ public class NotificationDispatchListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSubscriptionLow(SubscriptionLowEvent event) {
         try {
-            var parent = parentRepository.findById(event.parentId())
+            var parent = parentRepository.findByIdWithPreferences(event.parentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Parent not found"));
             String subject = "SportVision - Закінчується абонемент!";
 
@@ -203,7 +206,7 @@ public class NotificationDispatchListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSubscriptionExpired(SubscriptionExpiredEvent event) {
         try {
-            var parent = parentRepository.findById(event.parentId())
+            var parent = parentRepository.findByIdWithPreferences(event.parentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Parent not found"));
             var child = childRepository.findById(event.childId())
                 .orElseThrow(() -> new ResourceNotFoundException("Child not found"));
@@ -231,9 +234,9 @@ public class NotificationDispatchListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSessionReminder(SessionReminderEvent event) {
         try {
-            var session = sessionRepository.findById(event.sessionId())
+            var session = sessionRepository.findByIdWithGroup(event.sessionId())
                 .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
-            var children = childRepository.findAllByGroupId(session.getGroup().getId());
+            var children = childRepository.findAllByGroupIdWithParentAndPreferences(session.getGroup().getId());
 
             for (var child : children) {
                 var parent = child.getParent();

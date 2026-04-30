@@ -1,8 +1,10 @@
 package com.github.deniskoriavets.sportvision.notification;
 
 import com.github.deniskoriavets.sportvision.dto.NotificationMessage;
+import com.github.deniskoriavets.sportvision.entity.Parent;
 import com.github.deniskoriavets.sportvision.entity.enums.NotificationPreference;
 import com.github.deniskoriavets.sportvision.exception.EmailSendingException;
+import com.github.deniskoriavets.sportvision.repository.ParentRepository;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -26,6 +28,7 @@ public class SendGridEmailService implements EmailService, NotificationStrategy 
 
     private final SendGrid sendGrid;
     private final TemplateEngine templateEngine;
+    private final ParentRepository parentRepository;
 
     @Value("${app.sendgrid.from-email}")
     private String fromEmail;
@@ -35,9 +38,11 @@ public class SendGridEmailService implements EmailService, NotificationStrategy 
 
     @Override
     public void sendVerificationEmail(String to, String token) {
+        Parent parent = parentRepository.findByEmail(to)
+            .orElseThrow(() -> new EmailSendingException("Parent with email " + to + " not found"));
         String fullUrl = verificationUrl + "?token=" + token;
         Map<String, Object> variables = Map.of(
-            "firstName", "Користувач",
+            "firstName", parent.getFirstName(),
             "verificationUrl", fullUrl
         );
         sendHtmlEmail(to, "Підтвердження реєстрації - SportVision", "verification-email", variables);

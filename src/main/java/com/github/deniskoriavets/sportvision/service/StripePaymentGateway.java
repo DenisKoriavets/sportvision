@@ -24,6 +24,7 @@ public class StripePaymentGateway implements PaymentGateway {
         var params = SessionCreateParams.builder()
             .setSuccessUrl(successUrl)
             .setCancelUrl(cancelUrl)
+            .setLocale(SessionCreateParams.Locale.EN)
             .setMode(SessionCreateParams.Mode.PAYMENT)
             .putAllMetadata(metadata)
             .addLineItem(SessionCreateParams.LineItem.builder()
