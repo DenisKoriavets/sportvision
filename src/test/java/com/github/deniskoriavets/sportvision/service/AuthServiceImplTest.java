@@ -59,7 +59,7 @@ class AuthServiceImplTest {
     @DisplayName("Throws exception when email is already taken")
     void register_ThrowsException_WhenEmailTaken() {
         RegisterRequest request = new RegisterRequest("test@test.com", "Password123!", "Іван", "Іванов");
-        when(parentRepository.save(any())).thenThrow(DataIntegrityViolationException.class);
+        when(parentRepository.existsByEmail(request.email())).thenReturn(true);
 
         assertThrows(EmailAlreadyTakenException.class, () -> authService.register(request));
     }
