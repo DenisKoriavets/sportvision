@@ -1,6 +1,6 @@
 # 🏆 SportVision API
 
-> RESTful бекенд-застосунок для управління дитячими спортивними секціями на базі Spring Boot 4
+> RESTful backend application for managing children's sports sections built with Spring Boot 4
 
 [![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)](https://openjdk.org/projects/jdk/21/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.4-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
@@ -9,95 +9,95 @@
 
 ---
 
-## 📖 Про проєкт
+## 📖 About the Project
 
-**SportVision API** — це повноцінний RESTful бекенд для автоматизації роботи дитячих спортивних секцій. Система працює через батьків: батько реєструє акаунт, додає дітей і керує їхньою участю в тренуваннях — записує на заняття, оплачує абонементи та отримує нотифікації.
+**SportVision API** is a full-featured RESTful backend for automating the operations of children's sports sections. The system works through parents: a parent registers an account, adds children, and manages their participation in training — enrolling them in sessions, purchasing subscriptions, and receiving notifications.
 
-Бізнес-сторона системи контролює хто реально відвідує тренування і хто за них платить. Тренери відмічають відвідування через API, і система автоматично списує заняття з абонементу. Якщо абонемент закінчився — дитина не може бути записана на нові заняття. Сервіс бере на себе всю комунікацію з батьками: нагадування про тренування, повідомлення про зміни розкладу, попередження про закінчення абонементу.
+The business side of the system tracks who actually attends training and who pays for it. Coaches mark attendance through the API, and the system automatically deducts sessions from the subscription. If a subscription has expired, the child cannot be enrolled in new sessions. The service handles all communication with parents: training reminders, schedule change notifications, and subscription expiry warnings.
 
 ---
 
-## ✨ Функціональність
+## ✨ Features
 
-### 🔐 Автентифікація та безпека
-- Реєстрація з підтвердженням email через SendGrid
-- Stateless JWT автентифікація з **Access (15 хв) + Refresh (7 днів) токенами**
-- Ротація refresh токенів при кожному оновленні
-- Кастомна валідація паролю через `@Password` анотацію
-- Деактивація акаунтів адміністратором — заблокований користувач не може використовувати навіть валідний токен
-- Rate limit на повторне надсилання листа верифікації (раз на 2 хвилини)
+### 🔐 Authentication & Security
+- Registration with email confirmation via SendGrid
+- Stateless JWT authentication with **Access (15 min) + Refresh (7 days) tokens**
+- Refresh token rotation on every renewal
+- Custom password validation via `@Password` annotation
+- Account deactivation by administrator — a blocked user cannot use even a valid token
+- Rate limit on re-sending the verification email (once every 2 minutes)
 
-### 👨‍👩‍👧 Управління дітьми та групами
-- Батько може мати необмежену кількість дітей, кожна — окремий учасник
-- Запис дитини в групу перевіряє: вік, місткість групи та наявність активного абонементу
-- Динамічна фільтрація груп через **JPA Specification + Criteria API**: секція, тренер, вік, наявність місць (реалізовано через subquery)
-- `currentOccupancy` обчислюється через `@Formula` без окремого поля в БД
+### 👨‍👩‍👧 Children & Group Management
+- A parent can have an unlimited number of children, each being a separate participant
+- Enrolling a child in a group checks: age, group capacity, and presence of an active subscription
+- Dynamic group filtering via **JPA Specification + Criteria API**: section, coach, age, available spots (implemented via subquery)
+- `currentOccupancy` is computed via `@Formula` without a separate field in the DB
 
-### 📋 Відвідування та списання занять
-Ключовий бізнес-процес реалізований через **Event-Driven архітектуру**:
+### 📋 Attendance & Session Deduction
+The key business process is implemented via **Event-Driven architecture**:
 
 ```
-Тренер відмічає відвідування
+Coach marks attendance
     → AttendanceMarkedEvent
-        → SubscriptionDeductionListener: списує заняття
+        → SubscriptionDeductionListener: deducts a session
             → SubscriptionExpiredEvent / SubscriptionLowEvent
-                → NotificationDispatchListener: нотифікація батьку
+                → NotificationDispatchListener: notifies the parent
 ```
 
-- Масове відмічання відвідування одним запитом
-- Списання тільки при статусі `PRESENT`, ABSENT і EXCUSED не списують
-- **Optimistic locking** через `@Version` на Subscription запобігає race condition
-- При скасуванні заняття — заняття повертаються на абонемент через `SessionCancellationListener`
+- Bulk attendance marking in a single request
+- Deduction only for `PRESENT` status; ABSENT and EXCUSED do not deduct
+- **Optimistic locking** via `@Version` on Subscription prevents race conditions
+- When a session is cancelled — sessions are returned to the subscription via `SessionCancellationListener`
 
-### 💳 Платіжна система (Stripe)
-- Stripe Checkout redirect-based флоу
-- Верифікація підпису webhook через `Webhook.constructEvent()` — захист від підроблених запитів
-- Idempotency обробки webhook: повторний `checkout.session.completed` ігнорується
-- Scheduled job кожні 30 хвилин скасовує PENDING платежі старші 1 години
+### 💳 Payment System (Stripe)
+- Stripe Checkout redirect-based flow
+- Webhook signature verification via `Webhook.constructEvent()` — protection against forged requests
+- Idempotent webhook processing: a duplicate `checkout.session.completed` is ignored
+- Scheduled job every 30 minutes cancels PENDING payments older than 1 hour
 
-### 🔔 Нотифікації (Strategy Pattern)
-Три канали реалізовані через патерн **Strategy** з асинхронною відправкою:
-- **Email** — HTML шаблони через Thymeleaf + SendGrid REST API
-- **Telegram** — відправка через Telegram Bot API без зайвих бібліотек
+### 🔔 Notifications (Strategy Pattern)
+Three channels implemented via the **Strategy** pattern with asynchronous delivery:
+- **Email** — HTML templates via Thymeleaf + SendGrid REST API
+- **Telegram** — delivery via Telegram Bot API without extra libraries
 
-Батько вибирає канали у профілі. Якщо preferences порожні — fallback на Email.
+The parent selects channels in their profile. If preferences are empty — fallback to Email.
 
-### 📅 Заплановані задачі
-- `SessionReminderJob` — щодня о 18:00 нагадує про завтрашні тренування
-- `SubscriptionExpiryJob` — щодня о 9:00 попереджає про абонементи з ≤2 заняттями
-- `PaymentExpiryJob` — кожні 30 хвилин скасовує прострочені платежі
+### 📅 Scheduled Jobs
+- `SessionReminderJob` — every day at 18:00, reminds about tomorrow's training sessions
+- `SubscriptionExpiryJob` — every day at 9:00, warns about subscriptions with ≤2 sessions remaining
+- `PaymentExpiryJob` — every 30 minutes, cancels expired payments
 
 ---
 
-## 🛠️ Технологічний стек
+## 🛠️ Tech Stack
 
-| Категорія | Технологія |
+| Category | Technology |
 |---|---|
-| Мова | Java 21 |
-| Фреймворк | Spring Boot 4.0.4 |
-| Безпека | Spring Security + JJWT 0.12.6 |
+| Language | Java 21 |
+| Framework | Spring Boot 4.0.4 |
+| Security | Spring Security + JJWT 0.12.6 |
 | ORM | Spring Data JPA / Hibernate |
-| БД (prod) | PostgreSQL 15 |
-| БД (test) | Testcontainers + PostgreSQL |
-| Міграції | Liquibase |
-| Валідація | Jakarta Bean Validation + кастомні анотації |
-| Маппінг | MapStruct 1.5.5 |
+| DB (prod) | PostgreSQL 15 |
+| DB (test) | Testcontainers + PostgreSQL |
+| Migrations | Liquibase |
+| Validation | Jakarta Bean Validation + custom annotations |
+| Mapping | MapStruct 1.5.5 |
 | AOP | Spring AOP (AspectJ) |
-| Фільтрація | JPA Specification / Criteria API |
-| Платежі | Stripe Java SDK |
-| Email | SendGrid Java SDK + Thymeleaf шаблони |
+| Filtering | JPA Specification / Criteria API |
+| Payments | Stripe Java SDK |
+| Email | SendGrid Java SDK + Thymeleaf templates |
 | Telegram | Telegram Bot API (REST) |
-| Документація | SpringDoc OpenAPI 3.0 (Swagger UI) |
-| Тестування | JUnit 5 + Mockito + Testcontainers |
-| Збірка | Gradle |
-| Контейнери | Docker + Docker Compose |
+| Documentation | SpringDoc OpenAPI 3.0 (Swagger UI) |
+| Testing | JUnit 5 + Mockito + Testcontainers |
+| Build | Gradle |
+| Containers | Docker + Docker Compose |
 | CI/CD | GitHub Actions |
 
 ---
 
-## 🏗️ Архітектура
+## 🏗️ Architecture
 
-Проєкт побудовано за **Layered Architecture** з чітким розділенням відповідальності:
+The project is built on **Layered Architecture** with a clear separation of concerns:
 
 ```
 Controller → Service → Repository → Database
@@ -109,22 +109,22 @@ Controller → Service → Repository → Database
      Notification Channels
 ```
 
-Сервіси не викликають один одного напряму — комунікація через `ApplicationEventPublisher`. Це забезпечує loose coupling між модулями відвідування, абонементів і нотифікацій.
+Services do not call each other directly — communication happens through `ApplicationEventPublisher`. This ensures loose coupling between the attendance, subscription, and notification modules.
 
-### Структура пакетів
+### Package Structure
 
 ```
 src/main/java/com/github/deniskoriavets/sportvision/
 ├── aspect/             # LoggingAspect, AuditAspect, ExceptionLoggingAspect
 ├── config/             # JWT, Stripe, SendGrid, AsyncConfig, OpenAPI
-├── controller/         # REST-контролери
+├── controller/         # REST controllers
 ├── dto/                # Request / Response / Criteria records
-├── entity/             # JPA-сутності з soft delete (@SQLDelete)
+├── entity/             # JPA entities with soft delete (@SQLDelete)
 │   └── enums/          # Role, SessionStatus, SubscriptionStatus, ...
 ├── event/              # Domain events (records)
-├── exception/          # GlobalExceptionHandler + кастомні виключення
+├── exception/          # GlobalExceptionHandler + custom exceptions
 ├── listener/           # @TransactionalEventListener handlers
-├── mapper/             # MapStruct compile-time маппери
+├── mapper/             # MapStruct compile-time mappers
 ├── notification/       # NotificationStrategy, NotificationDispatcher
 ├── repository/         # Spring Data JPA + JpaSpecificationExecutor
 │   └── specification/  # Criteria API builders
@@ -136,23 +136,23 @@ src/main/java/com/github/deniskoriavets/sportvision/
 
 ---
 
-## 🚀 Запуск проєкту
+## 🚀 Running the Project
 
-### Передумови
+### Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) та [Docker Compose](https://docs.docker.com/compose/)
-- [JDK 21](https://adoptium.net/) — для локального запуску без Docker
+- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/)
+- [JDK 21](https://adoptium.net/) — for local run without Docker
 
-### 1. Клонування репозиторію
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/DenisKoriavets/sportvision.git
 cd sportvision
 ```
 
-### 2. Налаштування змінних середовища
+### 2. Configure Environment Variables
 
-Створіть файл `.env` у корені проєкту:
+Create a `.env` file in the project root:
 
 ```env
 JWT_SECRET_KEY=your-very-secret-key-at-least-256-bits-long-base64-encoded
@@ -167,23 +167,23 @@ STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 ```
 
-> ⚠️ Ніколи не комітьте `.env` у репозиторій. Він вже є у `.gitignore`.
+> ⚠️ Never commit `.env` to the repository. It is already in `.gitignore`.
 
-### 3. Запуск через Docker Compose
+### 3. Run with Docker Compose
 
 ```bash
-# Зібрати Docker-образ застосунку
+# Build the application Docker image
 docker build -t sportvision-api:latest .
 
-# Запустити застосунок та базу даних
+# Start the application and the database
 docker compose up -d
 ```
 
-Застосунок буде доступний за адресою: **http://localhost:8080**
+The application will be available at: **http://localhost:8080**
 
-### 4. Локальний запуск (без Docker)
+### 4. Local Run (without Docker)
 
-Переконайтесь, що PostgreSQL запущено та `.env` заповнено, потім:
+Make sure PostgreSQL is running and `.env` is filled in, then:
 
 ```bash
 ./gradlew bootRun
@@ -195,169 +195,169 @@ docker compose up -d
 
 ### 🔐 Auth — `/api/v1/auth`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `POST` | `/register` | Реєстрація батька | ❌ |
-| `POST` | `/login` | Вхід, отримання JWT пари | ❌ |
-| `POST` | `/refresh` | Оновлення access token | ❌ |
-| `POST` | `/logout` | Logout, інвалідація refresh token | ✅ |
-| `GET` | `/verify?token={token}` | Підтвердження email | ❌ |
-| `POST` | `/resend-verification` | Повторна відправка листа (rate limit: 2 хв) | ❌ |
+| `POST` | `/register` | Register a parent | ❌ |
+| `POST` | `/login` | Login, receive JWT pair | ❌ |
+| `POST` | `/refresh` | Refresh access token | ❌ |
+| `POST` | `/logout` | Logout, invalidate refresh token | ✅ |
+| `GET` | `/verify?token={token}` | Confirm email | ❌ |
+| `POST` | `/resend-verification` | Resend verification email (rate limit: 2 min) | ❌ |
 
-### 👤 Батьки — `/api/v1/parents`
+### 👤 Parents — `/api/v1/parents`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `GET` | `/me` | Отримати свій профіль | PARENT |
-| `PUT` | `/me` | Оновити профіль + notification preferences | PARENT |
-| `POST` | `/me/telegram/link` | Прив'язати Telegram чат | PARENT |
-| `GET` | `/` | Список всіх батьків | ADMIN |
-| `PUT` | `/{id}/deactivate` | Деактивувати акаунт | ADMIN |
+| `GET` | `/me` | Get own profile | PARENT |
+| `PUT` | `/me` | Update profile + notification preferences | PARENT |
+| `POST` | `/me/telegram/link` | Link Telegram chat | PARENT |
+| `GET` | `/` | List all parents | ADMIN |
+| `PUT` | `/{id}/deactivate` | Deactivate account | ADMIN |
 
-### 👶 Діти — `/api/v1/children`
+### 👶 Children — `/api/v1/children`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `GET` | `/` | Список своїх дітей | PARENT |
-| `POST` | `/` | Додати дитину | PARENT |
-| `GET` | `/{id}` | Деталі дитини | PARENT (owner) |
-| `PUT` | `/{id}` | Оновити дані дитини | PARENT (owner) |
-| `DELETE` | `/{id}` | Видалити дитину (soft delete) | PARENT (owner) |
-| `GET` | `/{id}/attendance` | Історія відвідувань | PARENT (owner) |
-| `GET` | `/{id}/subscriptions` | Абонементи дитини | PARENT (owner) |
-| `GET` | `/search` | Пошук дітей (фільтри) | Authenticated |
+| `GET` | `/` | List own children | PARENT |
+| `POST` | `/` | Add a child | PARENT |
+| `GET` | `/{id}` | Child details | PARENT (owner) |
+| `PUT` | `/{id}` | Update child data | PARENT (owner) |
+| `DELETE` | `/{id}` | Delete child (soft delete) | PARENT (owner) |
+| `GET` | `/{id}/attendance` | Attendance history | PARENT (owner) |
+| `GET` | `/{id}/subscriptions` | Child subscriptions | PARENT (owner) |
+| `GET` | `/search` | Search children (filters) | Authenticated |
 
-### 📝 Запис у групи — `/api/v1/enrollments`
+### 📝 Enrollments — `/api/v1/enrollments`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `POST` | `/` | Записати дитину в групу | PARENT |
-| `DELETE` | `/` | Відрахувати дитину з групи | PARENT |
+| `POST` | `/` | Enroll a child in a group | PARENT |
+| `DELETE` | `/` | Remove a child from a group | PARENT |
 
-### 🏟️ Секції — `/api/v1/sections`
+### 🏟️ Sections — `/api/v1/sections`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `GET` | `/` | Список секцій з фільтрами | Authenticated |
-| `POST` | `/` | Створити секцію | ADMIN |
-| `GET` | `/{id}` | Деталі секції | Authenticated |
-| `PUT` | `/{id}` | Оновити секцію | ADMIN |
-| `DELETE` | `/{id}` | Видалити секцію (soft delete) | ADMIN |
+| `GET` | `/` | List sections with filters | Authenticated |
+| `POST` | `/` | Create a section | ADMIN |
+| `GET` | `/{id}` | Section details | Authenticated |
+| `PUT` | `/{id}` | Update a section | ADMIN |
+| `DELETE` | `/{id}` | Delete a section (soft delete) | ADMIN |
 
-### 👥 Групи — `/api/v1/groups`
+### 👥 Groups — `/api/v1/groups`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `GET` | `/` | Список груп (фільтри: секція, тренер, вік, місця) | Authenticated |
-| `POST` | `/` | Створити групу | ADMIN |
-| `GET` | `/{id}` | Деталі групи | Authenticated |
-| `PUT` | `/{id}` | Оновити групу | ADMIN |
-| `DELETE` | `/{id}` | Видалити групу (soft delete) | ADMIN |
-| `GET` | `/{id}/children` | Список дітей у групі | COACH / ADMIN |
+| `GET` | `/` | List groups (filters: section, coach, age, spots) | Authenticated |
+| `POST` | `/` | Create a group | ADMIN |
+| `GET` | `/{id}` | Group details | Authenticated |
+| `PUT` | `/{id}` | Update a group | ADMIN |
+| `DELETE` | `/{id}` | Delete a group (soft delete) | ADMIN |
+| `GET` | `/{id}/children` | List children in a group | COACH / ADMIN |
 
-### 📅 Розклад — `/api/v1/schedules`
+### 📅 Schedules — `/api/v1/schedules`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `POST` | `/` | Додати слот розкладу | ADMIN / COACH |
-| `GET` | `/group/{groupId}` | Розклад групи | Authenticated |
-| `DELETE` | `/{id}` | Видалити слот | ADMIN / COACH |
+| `POST` | `/` | Add a schedule slot | ADMIN / COACH |
+| `GET` | `/group/{groupId}` | Group schedule | Authenticated |
+| `DELETE` | `/{id}` | Delete a slot | ADMIN / COACH |
 
-### 🎯 Заняття — `/api/v1/sessions`
+### 🎯 Sessions — `/api/v1/sessions`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `POST` | `/generate` | Згенерувати заняття за розкладом | ADMIN |
-| `POST` | `/` | Створити разове заняття | ADMIN / COACH |
-| `PUT` | `/{id}/cancel` | Скасувати заняття | ADMIN / COACH |
-| `POST` | `/{id}/attendance` | Відмітити відвідування (масово) | COACH |
-| `PUT` | `/{sessionId}/attendance/{childId}` | Виправити відмітку (тільки для SCHEDULED) | COACH / ADMIN |
-| `GET` | `/group/{groupId}` | Заняття групи за датами | Authenticated |
-| `GET` | `/` | Пошук занять з фільтрами | Authenticated |
+| `POST` | `/generate` | Generate sessions from schedule | ADMIN |
+| `POST` | `/` | Create a one-time session | ADMIN / COACH |
+| `PUT` | `/{id}/cancel` | Cancel a session | ADMIN / COACH |
+| `POST` | `/{id}/attendance` | Mark attendance (bulk) | COACH |
+| `PUT` | `/{sessionId}/attendance/{childId}` | Correct a mark (only for SCHEDULED) | COACH / ADMIN |
+| `GET` | `/group/{groupId}` | Group sessions by date | Authenticated |
+| `GET` | `/` | Search sessions with filters | Authenticated |
 
-### 🎫 Абонементи — `/api/v1/subscriptions`
+### 🎫 Subscriptions — `/api/v1/subscriptions`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `POST` | `/admin/buy` | Купити абонемент за готівку | ADMIN |
-| `GET` | `/child/{childId}` | Абонементи дитини | PARENT |
-| `GET` | `/{id}` | Деталі абонементу | PARENT (owner) |
-| `PUT` | `/{id}/cancel` | Скасувати абонемент | PARENT (owner) |
+| `POST` | `/admin/buy` | Purchase a subscription for cash | ADMIN |
+| `GET` | `/child/{childId}` | Child subscriptions | PARENT |
+| `GET` | `/{id}` | Subscription details | PARENT (owner) |
+| `PUT` | `/{id}/cancel` | Cancel a subscription | PARENT (owner) |
 
-### 💰 Платежі — `/api/v1/payments`
+### 💰 Payments — `/api/v1/payments`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `POST` | `/checkout` | Створити Stripe Checkout Session | PARENT |
-| `GET` | `/` | Список своїх платежів | PARENT |
-| `GET` | `/{id}` | Деталі платежу (тільки свої) | PARENT |
-| `POST` | `/webhook` | Stripe Webhook з верифікацією підпису | Public (Stripe) |
+| `POST` | `/checkout` | Create a Stripe Checkout Session | PARENT |
+| `GET` | `/` | List own payments | PARENT |
+| `GET` | `/{id}` | Payment details (own only) | PARENT |
+| `POST` | `/webhook` | Stripe Webhook with signature verification | Public (Stripe) |
 
-### 📊 Тарифні плани — `/api/v1/subscription-plans`
+### 📊 Subscription Plans — `/api/v1/subscription-plans`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `GET` | `/` | Список планів з фільтрами | Authenticated |
-| `GET` | `/{id}` | Деталі плану | Authenticated |
-| `POST` | `/` | Створити план | ADMIN |
-| `PUT` | `/{id}` | Оновити план | ADMIN |
-| `DELETE` | `/{id}` | Видалити план | ADMIN |
+| `GET` | `/` | List plans with filters | Authenticated |
+| `GET` | `/{id}` | Plan details | Authenticated |
+| `POST` | `/` | Create a plan | ADMIN |
+| `PUT` | `/{id}` | Update a plan | ADMIN |
+| `DELETE` | `/{id}` | Delete a plan | ADMIN |
 
-### 🏋️ Тренери — `/api/v1/coaches`
+### 🏋️ Coaches — `/api/v1/coaches`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `GET` | `/` | Список тренерів | Authenticated |
-| `POST` | `/{id}/assign` | Призначити роль COACH | ADMIN |
-| `DELETE` | `/{id}/revoke` | Відкликати роль COACH | ADMIN |
-| `GET` | `/{id}/groups` | Групи тренера | COACH / ADMIN |
+| `GET` | `/` | List coaches | Authenticated |
+| `POST` | `/{id}/assign` | Assign COACH role | ADMIN |
+| `DELETE` | `/{id}/revoke` | Revoke COACH role | ADMIN |
+| `GET` | `/{id}/groups` | Coach's groups | COACH / ADMIN |
 
-### ⚙️ Адмін — `/api/v1/admin`
+### ⚙️ Admin — `/api/v1/admin`
 
-| Метод | Endpoint | Опис | Auth |
+| Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `GET` | `/stats` | Загальна статистика системи | ADMIN |
-| `GET` | `/children` | Всі діти в системі (з фільтрами) | ADMIN |
-| `GET` | `/children/{id}` | Дитина по id (без ownership перевірки) | ADMIN |
-| `DELETE` | `/children/{id}` | Видалити будь-яку дитину (soft delete) | ADMIN |
-| `GET` | `/subscriptions` | Всі абонементи (фільтр по статусу) | ADMIN |
-| `PUT` | `/subscriptions/{id}/activate` | Ручна активація абонементу | ADMIN |
+| `GET` | `/stats` | Overall system statistics | ADMIN |
+| `GET` | `/children` | All children in the system (with filters) | ADMIN |
+| `GET` | `/children/{id}` | Child by id (without ownership check) | ADMIN |
+| `DELETE` | `/children/{id}` | Delete any child (soft delete) | ADMIN |
+| `GET` | `/subscriptions` | All subscriptions (filter by status) | ADMIN |
+| `PUT` | `/subscriptions/{id}/activate` | Manual subscription activation | ADMIN |
 
 ---
 
 ## 📚 Swagger UI
 
-Після запуску застосунку інтерактивна документація API доступна за адресою:
+After starting the application, the interactive API documentation is available at:
 
 ```
 http://localhost:8080/swagger-ui.html
 ```
 
-Специфікація OpenAPI у JSON:
+OpenAPI specification in JSON:
 
 ```
 http://localhost:8080/api-docs
 ```
 
-Swagger UI підтримує JWT авторизацію — натисніть **Authorize** і введіть `Bearer <token>`.
+Swagger UI supports JWT authorization — click **Authorize** and enter `Bearer <token>`.
 
 ---
 
-## 🧪 Тестування
+## 🧪 Testing
 
-Проєкт містить юніт- та інтеграційні тести для всіх шарів.
+The project contains unit and integration tests for all layers.
 
 ```bash
-# Запустити всі тести
+# Run all tests
 ./gradlew test
 
-# Запустити з детальним виводом
+# Run with detailed output
 ./gradlew test --info
 ```
 
-### Покриття тестами
+### Test Coverage
 
-| Шар | Тести |
+| Layer | Tests |
 |---|---|
 | Integration (Controllers) | Auth, Child, Group, Enrollment, Parent, Subscription, Payment, Attendance |
 | Unit (Services) | Auth, Child (+ admin ops), Group, Session, Enrollment, Subscription (+ payment history, admin activate), SubscriptionPlan, PaymentCleanup, Parent (coach revoke) |
@@ -365,13 +365,13 @@ Swagger UI підтримує JWT авторизацію — натисніть 
 | Unit (Schedulers) | NotificationScheduler |
 | Repository | Child (soft delete), Subscription (optimistic locking) |
 
-> Усі integration тести запускаються проти **реального PostgreSQL контейнеру** через Testcontainers — H2 не використовується. Це гарантує що Liquibase міграції, `@SQLDelete` і складні JPQL запити працюють як у prod.
+> All integration tests run against a **real PostgreSQL container** via Testcontainers — H2 is not used. This guarantees that Liquibase migrations, `@SQLDelete`, and complex JPQL queries work as they do in production.
 
 ---
 
-## 🗄️ База даних
+## 🗄️ Database
 
-Схема БД керується через **Liquibase** і версіонується у вигляді міграцій:
+The DB schema is managed via **Liquibase** and versioned as migrations:
 
 ```
 src/main/resources/db/changelog/migrations/
@@ -390,58 +390,58 @@ src/main/resources/db/changelog/migrations/
 └── 013-create-payments-table.xml
 ```
 
-Міграції застосовуються автоматично при старті застосунку. Фізичного видалення немає — всі основні entity мають `is_deleted` колонку і `@SQLRestriction` на рівні Hibernate.
+Migrations are applied automatically on application startup. There is no physical deletion — all main entities have an `is_deleted` column and `@SQLRestriction` at the Hibernate level.
 
 ---
 
-## ⚙️ Конфігурація
+## ⚙️ Configuration
 
-Застосунок підтримує профілі Spring:
+The application supports Spring profiles:
 
-| Профіль | Файл | Опис |
+| Profile | File | Description |
 |---|---|---|
-| `dev` (default) | `application-dev.yaml` | Локальна розробка, PostgreSQL |
-| `test` | `application-test.yaml` | Тести, Testcontainers |
+| `dev` (default) | `application-dev.yaml` | Local development, PostgreSQL |
+| `test` | `application-test.yaml` | Tests, Testcontainers |
 
-### Необхідні змінні середовища
+### Required Environment Variables
 
-| Змінна | Опис |
+| Variable | Description |
 |---|---|
-| `JWT_SECRET_KEY` | Base64-encoded секрет для підписання JWT (мінімум 256 біт) |
-| `SENDGRID_API_KEY` | API ключ SendGrid для відправки email |
-| `SENDGRID_FROM_EMAIL` | Email відправника |
-| `STRIPE_SECRET_KEY` | Secret key Stripe (`sk_test_...` або `sk_live_...`) |
+| `JWT_SECRET_KEY` | Base64-encoded secret for signing JWT (minimum 256 bits) |
+| `SENDGRID_API_KEY` | SendGrid API key for sending emails |
+| `SENDGRID_FROM_EMAIL` | Sender email address |
+| `STRIPE_SECRET_KEY` | Stripe secret key (`sk_test_...` or `sk_live_...`) |
 | `STRIPE_WEBHOOK_SECRET` | Webhook signing secret (`whsec_...`) |
-| `TELEGRAM_BOT_TOKEN` | Токен Telegram бота для нотифікацій |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token for notifications |
 
 ---
 
 ## 🔄 CI/CD
 
-GitHub Actions автоматично запускає pipeline при кожному push або pull request у будь-яку гілку:
+GitHub Actions automatically runs the pipeline on every push or pull request to any branch:
 
-1. **Checkout** — клонування репозиторію
-2. **Setup JDK 21** (Temurin distribution, кешування Gradle)
-3. **Build & Test** — `./gradlew clean build` із запуском Testcontainers
-4. **Upload Test Report** — артефакт з HTML звітом при падінні тестів
-5. **Docker Build** — перевірка що Dockerfile компілюється
+1. **Checkout** — clone the repository
+2. **Setup JDK 21** (Temurin distribution, Gradle caching)
+3. **Build & Test** — `./gradlew clean build` with Testcontainers
+4. **Upload Test Report** — artifact with HTML report on test failure
+5. **Docker Build** — verify that the Dockerfile compiles
 
-Конфігурація: `.github/workflows/pipeline.yml`
-
----
-
-## 🔒 Безпека
-
-- Паролі зберігаються у хешованому вигляді (BCrypt)
-- Stateless JWT автентифікація — сервер не зберігає сесії
-- Refresh токени зберігаються у БД і видаляються при logout
-- `JwtAuthenticationFilter` перевіряє `isEnabled()` і `isEmailVerified()` при кожному запиті
-- Webhook ендпоінт верифікує HMAC підпис Stripe перед обробкою
-- Soft delete — дані фізично не видаляються
+Configuration: `.github/workflows/pipeline.yml`
 
 ---
 
-## 👤 Автор
+## 🔒 Security
+
+- Passwords are stored hashed (BCrypt)
+- Stateless JWT authentication — the server does not store sessions
+- Refresh tokens are stored in the DB and deleted on logout
+- `JwtAuthenticationFilter` checks `isEnabled()` and `isEmailVerified()` on every request
+- Webhook endpoint verifies the Stripe HMAC signature before processing
+- Soft delete — data is not physically deleted
+
+---
+
+## 👤 Author
 
 **Denis Koriavets**
 
